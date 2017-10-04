@@ -1,7 +1,7 @@
 import nibabel as nib
 import pandas as pd
 
-class TemporalImage(nib.SpatialImage):
+class TemporalImage(nib.analyze.SpatialImage):
     def __init__(self, timeSeriesImgFile, frameTimingFile,
                  startTime=-float('Inf'), endTime=float('Inf')):
 
@@ -11,7 +11,7 @@ class TemporalImage(nib.SpatialImage):
         if not len(img.shape)==4:
             raise ValueError('Image must be 4D')
 
-        if not img.shape[4]==len(self.frameStart):
+        if not img.shape[3]==len(self.frameStart):
             raise ValueError('4th dimension of image must match the number of columns in frame timing file')
 
         #self.startIndex = 0
@@ -87,7 +87,7 @@ class TemporalImage(nib.SpatialImage):
         return self.endTime
 
     def get_sliceObj(self):
-        sliceObj = slice(startIndex,endIndex)
+        sliceObj = slice(self.startIndex,self.endIndex)
         return sliceObj
 
 

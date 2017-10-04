@@ -1,0 +1,6 @@
+nibabel
+pandas
+scipy
+numpy
+math
+os
