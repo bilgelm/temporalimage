@@ -10,11 +10,9 @@ setup(name='temporalimage',
       packages=['temporalimage'],
       install_requires=[
           'nibabel',
-          'pandas'
-          'scipy'
-          'numpy'
-          'math'
-          'os'
+          'pandas',
+          'scipy',
+          'numpy',
       ],
       zip_safe=False,
       test_suite='nose.collector',
