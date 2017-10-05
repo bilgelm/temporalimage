@@ -1,12 +1,7 @@
-#from temporalimage import TemporalImage
-#from temporalimage import load as ti_load
-#from temporalimage import save as ti_save
 import temporalimage
 from .generate_test_data import generate_fake4D
 import os
-
 import unittest
-#[0, 5, 10, 20, 30, 40, 50]
 
 class TestTemporalImageFake4D(unittest.TestCase):
     def setUp(self):
