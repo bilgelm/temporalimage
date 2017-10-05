@@ -14,7 +14,8 @@ def generate_fake4D():
     frameDuration = frameEnd - frameStart
     timingData = pd.DataFrame(data={'Duration of time frame (min)': frameDuration,
                                     'Elapsed time (min)': frameEnd})
-    csvfilename = os.path.join(os.pardir,'data','timingData.csv')
+    csvfilename = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                               os.pardir,'data','timingData.csv'))
     timingData.to_csv(csvfilename, index=False)
 
     R1 = 1.0
@@ -35,7 +36,8 @@ def generate_fake4D():
 
     # save 4D image
     img = nib.Nifti1Image(img_dat, np.eye(4))
-    imgfilename = os.path.join(os.pardir,'data','img.nii.gz')
+    imgfilename = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                               os.pardir,'data','img.nii.gz'))
     nib.save(img, imgfilename)
 
     return (imgfilename, csvfilename)
