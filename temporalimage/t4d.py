@@ -132,16 +132,28 @@ class TemporalImage(SpatialImage):
         return (firstImg, secondImg)
 
     def dynamicMean(self):
-        # time-weighted dynamic mean
+        '''
+            Time-weighted dynamic mean
+        '''
         meanImg_dat = np.mean(self.get_data() / self.get_frameDuration(), axis=3)
         meanImg = SpatialImage(np.squeeze(meanImg_dat), self.affine, self.header,
                                    self.extra, self.file_map)
         return meanImg
 
-def _csvread_frameTiming(frameTimingCsvFile):
+def _csvread_frameTiming(csvfilename):
+    '''
+        Read frame timing information from csv file
+        There must be one column named 'Duration of time frame (min)'
+        and another named 'Elapsed time (min)'
+
+        Args
+        ----
+            frameTimingCsvFile : string
+                specification of csv file containing frame timing information
+    '''
     from pandas import read_csv
 
-    frameTiming = read_csv(frameTimingCsvFile)
+    frameTiming = read_csv(csvfilename)
 
     # check that frameTiming has the required columns
     for col in ['Duration of time frame (min)','Elapsed time (min)']:
@@ -156,11 +168,25 @@ def _csvread_frameTiming(frameTimingCsvFile):
 
     return (frameStart, frameEnd)
 
-def _csvwrite_frameTiming(frameEnd, frameStart, csvfilename):
+def _csvwrite_frameTiming(frameStart, frameEnd, csvfilename):
+    '''
+        Write frame timing information to csv file
+        There will be one column named 'Duration of time frame (min)'
+        and another named 'Elapsed time (min)'
+
+        Args
+        ----
+            frameStart : np.array
+                array of frame start times
+            frameEnd : np.array
+                array of frame end times
+            csvfilename : string
+                specification of output csv file
+    '''
     from pandas import DataFrame
 
     timingData = DataFrame(data={'Duration of time frame (min)': frameEnd - frameStart,
-                                    'Elapsed time (min)': frameEnd})
+                                 'Elapsed time (min)': frameEnd})
     timingData.to_csv(csvfilename, index=False)
 
 def load(filename, timingfilename, **kwargs):
@@ -193,8 +219,17 @@ def load(filename, timingfilename, **kwargs):
 def save(img, filename, csvfilename):
     '''
     Save a temporal image
+
+    Args
+    ----
+        img : TemporalImage
+            temporal 4D image to save
+        filename : string
+            specification of output image filename
+        csvfile : string
+            specification of output csv filename for timing information
     '''
     from nibabel import save as nibsave
 
     nibsave(img, filename)
-    _csvwrite_frameTiming(img.frameEnd, img.frameStart, csvfilename)
+    _csvwrite_frameTiming(img.frameStart, img.frameEnd, csvfilename)
