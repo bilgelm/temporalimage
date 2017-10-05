@@ -131,15 +131,6 @@ class TemporalImage(SpatialImage):
         secondImg = self.extractTime(splitTime, self.frameEnd[-1])
         return (firstImg, secondImg)
 
-    def dynamicMean(self):
-        '''
-            Time-weighted dynamic mean
-        '''
-        meanImg_dat = np.mean(self.get_data() / self.get_frameDuration(), axis=3)
-        meanImg = SpatialImage(np.squeeze(meanImg_dat), self.affine, self.header,
-                                   self.extra, self.file_map)
-        return meanImg
-
 def _csvread_frameTiming(csvfilename):
     '''
         Read frame timing information from csv file

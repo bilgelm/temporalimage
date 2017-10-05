@@ -112,10 +112,3 @@ class TestTemporalImageFake4D(unittest.TestCase):
         self.assertEqual(secondImg.get_data().shape[3], 1)
         self.assertEqual(secondImg.get_startTime(), splitTime)
         self.assertEqual(secondImg.get_endTime(), self.timg.get_endTime())
-
-    def test_dynamicMean(self):
-        '''
-        Dynamic mean
-        '''
-        meanImg = self.timg.dynamicMean()
-        self.assertEqual(meanImg.get_data().shape, self.timg.get_data().shape[:-1])
