@@ -34,6 +34,8 @@ def generate_fake4D():
                 else:
                     img_dat[i,j,k,:] = Ct
 
+
+
     # save 4D image
     img = nib.Nifti1Image(img_dat, np.eye(4))
     imgfilename = os.path.abspath(os.path.join(os.path.dirname(__file__),

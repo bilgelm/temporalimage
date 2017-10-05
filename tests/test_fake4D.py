@@ -1,19 +1,18 @@
-from temporalimage import TemporalImage
+#from temporalimage import TemporalImage
+#from temporalimage import load as ti_load
+#from temporalimage import save as ti_save
+import temporalimage
 from .generate_test_data import generate_fake4D
 import os
 
 import unittest
+#[0, 5, 10, 20, 30, 40, 50]
 
 class TestTemporalImageFake4D(unittest.TestCase):
     def setUp(self):
         imgfile, timingfile = generate_fake4D()
-        self.timg = TemporalImage(imgfile, timingfile)
-
-    def test_get_startIndex(self):
-        self.assertEqual(0, self.timg.get_startIndex())
-
-    def test_get_endIndex(self):
-        self.assertEqual(self.timg.shape[-1], self.timg.get_endIndex())
+        #self.timg = TemporalImage(imgfile, timingfile)
+        self.timg = temporalimage.load(imgfile, timingfile)
 
     def test_get_startTime(self):
         self.assertEqual(0, self.timg.get_startTime())
@@ -21,36 +20,107 @@ class TestTemporalImageFake4D(unittest.TestCase):
     def test_get_endTime(self):
         self.assertEqual(60, self.timg.get_endTime())
 
-class TestTemporalImageFake4D_2(unittest.TestCase):
-    def setUp(self):
-        imgfile, timingfile = generate_fake4D()
-        self.timg = TemporalImage(imgfile, timingfile, 10, 40)
+    def test_extractTime_silly(self):
+        '''
+        Silly test where we call extractTime without actually changing the start or end times
+        '''
+        startTime = self.timg.get_startTime()
+        endTime = self.timg.get_endTime()
 
-    def test_get_startIndex(self):
-        self.assertEqual(2, self.timg.get_startIndex())
+        extr = self.timg.extractTime(startTime, endTime)
+        self.assertEqual(extr.get_data().shape[3], 7)
+        self.assertEqual(extr.get_startTime(), startTime)
+        self.assertEqual(extr.get_endTime(), endTime)
 
-    def test_get_endIndex(self):
-        self.assertEqual(5, self.timg.get_endIndex())
+    def test_extractTime_secondHalf(self):
+        '''
+        Extract second half
+        '''
+        frameStart = self.timg.get_frameStart()
 
-    def test_get_startTime(self):
-        self.assertEqual(10, self.timg.get_startTime())
+        startTime = frameStart[len(frameStart)//2]
+        endTime = self.timg.get_endTime()
 
-    def test_get_endTime(self):
-        self.assertEqual(40, self.timg.get_endTime())
+        extr = self.timg.extractTime(startTime, endTime)
+        self.assertEqual(extr.get_data().shape[3], len(frameStart) - len(frameStart)//2)
+        self.assertEqual(extr.get_startTime(), startTime)
+        self.assertEqual(extr.get_endTime(), endTime)
 
-class TestTemporalImageFake4D_3(unittest.TestCase):
-    def setUp(self):
-        imgfile, timingfile = generate_fake4D()
-        self.timg = TemporalImage(imgfile, timingfile, 11, 39)
+    def test_extractTime_firstHalf(self):
+        '''
+        Extract first half
+        '''
+        frameEnd = self.timg.get_frameEnd()
 
-    def test_get_startIndex(self):
-        self.assertEqual(3, self.timg.get_startIndex())
+        startTime = self.timg.get_startTime()
+        endTime = frameEnd[len(frameEnd)//2]
 
-    def test_get_endIndex(self):
-        self.assertEqual(4, self.timg.get_endIndex())
+        extr = self.timg.extractTime(startTime, endTime)
+        self.assertEqual(extr.get_data().shape[3], len(frameEnd)//2 + 1)
+        self.assertEqual(extr.get_startTime(), startTime)
+        self.assertEqual(extr.get_endTime(), endTime)
 
-    def test_get_startTime(self):
-        self.assertEqual(20, self.timg.get_startTime())
+    def test_extractTime_middle(self):
+        '''
+        Extract the middle portion
+        '''
 
-    def test_get_endTime(self):
-        self.assertEqual(30, self.timg.get_endTime())
+        frameStart = self.timg.get_frameStart()
+        frameEnd = self.timg.get_frameEnd()
+
+        startTime = frameStart[1]
+        endTime = frameEnd[-2]
+
+        extr = self.timg.extractTime(startTime, endTime)
+        self.assertEqual(extr.get_data().shape[3], len(frameStart) - 2)
+        self.assertEqual(extr.get_startTime(), startTime)
+        self.assertEqual(extr.get_endTime(), endTime)
+
+    def test_extractTime_middle_fuzzy(self):
+        '''
+        Extract the middle portion, fuzzy
+        '''
+
+        frameStart = self.timg.get_frameStart()
+        frameEnd = self.timg.get_frameEnd()
+
+        startTime = frameStart[1] + .1
+        endTime = frameEnd[-2] - .1
+
+        extr = self.timg.extractTime(startTime, endTime)
+        self.assertEqual(extr.get_data().shape[3], len(frameStart) - 4)
+        self.assertEqual(extr.get_startTime(), frameStart[2])
+        self.assertEqual(extr.get_endTime(), frameEnd[-3])
+
+    def test_splitTime_first(self):
+        '''
+        Split after first frame
+        '''
+        splitTime = self.timg.get_frameStart()[1]
+        (firstImg, secondImg) = self.timg.splitTime(splitTime)
+        self.assertEqual(firstImg.get_data().shape[3], 1)
+        self.assertEqual(firstImg.get_startTime(), self.timg.get_startTime())
+        self.assertEqual(firstImg.get_endTime(), splitTime)
+        self.assertEqual(secondImg.get_data().shape[3], self.timg.get_data().shape[3]-1)
+        self.assertEqual(secondImg.get_startTime(), splitTime)
+        self.assertEqual(secondImg.get_endTime(), self.timg.get_endTime())
+
+    def test_splitTime_last(self):
+        '''
+        Split before last frame
+        '''
+        splitTime = self.timg.get_frameStart()[-1]
+        (firstImg, secondImg) = self.timg.splitTime(splitTime)
+        self.assertEqual(firstImg.get_data().shape[3], self.timg.get_data().shape[3]-1)
+        self.assertEqual(firstImg.get_startTime(), self.timg.get_startTime())
+        self.assertEqual(firstImg.get_endTime(), splitTime)
+        self.assertEqual(secondImg.get_data().shape[3], 1)
+        self.assertEqual(secondImg.get_startTime(), splitTime)
+        self.assertEqual(secondImg.get_endTime(), self.timg.get_endTime())
+
+    def test_dynamicMean(self):
+        '''
+        Dynamic mean
+        '''
+        meanImg = self.timg.dynamicMean()
+        self.assertEqual(meanImg.get_data().shape, self.timg.get_data().shape[:-1])

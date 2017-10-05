@@ -1,103 +1,200 @@
-import nibabel as nib
-import pandas as pd
+from nibabel.analyze import SpatialImage
+import numpy as np
 
-class TemporalImage(nib.analyze.SpatialImage):
-    def __init__(self, timeSeriesImgFile, frameTimingFile,
-                 startTime=-float('Inf'), endTime=float('Inf')):
+class TemporalImage(SpatialImage):
+    def __init__(self, dataobj, affine, frameStart, frameEnd, header=None,
+                 extra=None, file_map=None):
 
-        img = nib.load(timeSeriesImgFile)
-        self._csvread_frameTiming(frameTimingFile)
-
-        if not len(img.shape)==4:
-            raise ValueError('Image must be 4D')
-
-        if not img.shape[3]==len(self.frameStart):
-            raise ValueError('4th dimension of image must match the number of columns in frame timing file')
-
-        #self.startIndex = 0
-        #self.endIndex = len(self.frameStart)
-        self._set_startEndIndices(startTime, endTime)
-
-        dataobj = img.get_data()[:,:,:,self.get_sliceObj()]
-        affine = img.get_affine()
-        header = img.get_header()
-        extra = img.extra
-        file_map = img.file_map
         super().__init__(dataobj, affine=affine, header=header,
                          extra=extra, file_map=file_map)
 
-    # overwrites get_data in SpatialImage, I hope
-    #def get_data(self):
-    #    return img.get_data()[:,:,:,self.get_sliceObj()]
+        if not self.get_data().ndim==4:
+            raise ValueError('Image must be 4D')
 
-    def _csvread_frameTiming(self, frameTimingCsvFile):
-        frameTiming = pd.read_csv(frameTimingCsvFile)
+        if not len(frameStart)==len(frameEnd):
+            raise ValueError('There should be equal number of frame start and frame end times')
 
-        # check that frameTiming has the required columns
-        for col in ['Duration of time frame (min)','Elapsed time (min)']:
-            if not col in frameTiming.columns:
-                raise IOError('Required column '+col+' is not present in the frame timing spreadsheet '+frameTimingCsvFile+'!')
+        if not self.get_data().shape[3]==len(frameStart):
+            raise ValueError('4th dimension of image must match the number of columns in frame timing file')
 
-        frameStart = frameTiming['Elapsed time (min)'] - frameTiming['Duration of time frame (min)']
-        frameEnd = frameTiming['Elapsed time (min)']
+        self.frameStart = np.array(frameStart)
+        self.frameEnd = np.array(frameEnd)
 
-        self.frameStart = frameStart.as_matrix() #tolist()
-        self.frameEnd = frameEnd.as_matrix() #tolist()
+    def get_frameStart(self):
+        '''
+            Get the array of starting times for each frame
+        '''
+        return self.frameStart
 
-    def _update_times(self):
-        # another sanity check, mainly to make sure that startIndex!=endIndex
-        if not self.startIndex<self.endIndex:
-            raise ValueError('Start index must be smaller than end index')
+    def get_frameEnd(self):
+        '''
+            Get the array of ending times for each frame
+        '''
+        return self.frameEnd
 
-        # the actual start and end times for the 4D image to be used
-        self.startTime = self.frameStart[self.startIndex]
-        self.endTime = self.frameEnd[self.endIndex-1]
+    def get_startTime(self):
+        '''
+            Get the starting time of first frame
+        '''
+        return self.frameStart[0]
 
-    def _set_startEndIndices(self, startTime, endTime):
+    def get_endTime(self):
+        '''
+            Get the ending time of last frame
+        '''
+        return self.frameEnd[-1]
+
+    def get_frameDuration(self):
+        '''
+            Get the array of durations for each frame
+        '''
+        # Compute the duration of each time frame
+        delta = self.frameEnd - self.frameStart
+        return delta
+
+    def get_midTime(self):
+        '''
+            Get the array of mid-time point for each frame
+        '''
+        # Compute the time mid-way for each time frame
+        t = (self.frameStart + self.frameEnd)/2
+        return t
+
+    def extractTime(self, startTime, endTime):
+        '''
+        Extract a 4D temporal image from a longer-duration 4D temporal image
+
+        Args
+        ----
+            startTime : float
+                time at which to begin, inclusive
+            endTime : float
+                time at which to stop, exclusive
+        '''
+        import warnings
+
+        if startTime >= endTime:
+            raise ValueError('Start time must be before end time')
+
         if startTime < self.frameStart[0]:
             startTime = self.frameStart[0]
-            # warning
+            warnings.warn("Specified start time is before the start time of the first frame. " +
+                          "Constraining start time to be the start time of the first frame.", RuntimeWarning)
         elif startTime > self.frameEnd[-1]:
             raise ValueError('Start time is beyond the time covered by the time series data!')
 
         # find the first time frame with frameStart at or shortest after the specified start time
-        self.startIndex = next((i for i,t in enumerate(self.frameStart) if t>=startTime), len(self.frameStart)-1)
+        startIndex = next((i for i,t in enumerate(self.frameStart) if t>=startTime), len(self.frameStart)-1)
 
         if endTime > self.frameEnd[-1]:
             endTime = self.frameEnd[-1]
-            # warning
+            warnings.warn("Specified end time is beyond the end time of the last frame. " +
+                          "Constraining end time to be the end time of the last frame.", RuntimeWarning)
         elif endTime < self.frameStart[0]:
             raise ValueError('End time is prior to the time covered by the time series data!')
 
         # find the first time frame with frameEnd shortest after the specified end time
-        self.endIndex = next((i for i,t in enumerate(self.frameEnd) if t>endTime), len(self.frameStart))
-
-        self._update_times()
-
-    def get_startIndex(self):
-        return self.startIndex
-
-    def get_startTime(self):
-        return self.startTime
-
-    def get_endIndex(self):
-        return self.endIndex
-
-    def get_endTime(self):
-        return self.endTime
-
-    def get_sliceObj(self):
-        sliceObj = slice(self.startIndex,self.endIndex)
-        return sliceObj
+        endIndex = next((i for i,t in enumerate(self.frameEnd) if t>endTime), len(self.frameStart))
 
 
+        # another sanity check, mainly to make sure that startIndex!=endIndex
+        if not startIndex<endIndex:
+            raise ValueError('Start index must be smaller than end index')
 
-    def get_midTime(self):
-        # Compute the time mid-way for each time frame
-        t = (self.frameStart[get_sliceObj()] + self.frameEnd[get_sliceObj()])/2
-        return t
+        if not self.frameStart[startIndex]==startTime:
+            warnings.warn("Specified start time " + str(startTime) + " did not match the start time of any of the frames. " +
+                          "Using " + str(self.frameStart[startIndex]) + " as start time instead.",
+                          RuntimeWarning)
+        if not self.frameEnd[endIndex-1]==endTime:
+            warnings.warn("Specified end time " + str(endTime) + " did not match the end time of any of the frames. " +
+                          "Using " + str(self.frameEnd[endIndex-1]) + " as end time instead.",
+                          RuntimeWarning)
 
-    def get_frameDuration(self):
-        # Compute the duration of each time frame
-        delta = self.frameEnd[get_sliceObj()] - self.frameStart[get_sliceObj()]
-        return delta
+        sliceObj = slice(startIndex,endIndex)
+
+        return TemporalImage(self.get_data()[:,:,:,sliceObj], self.affine,
+                             self.frameStart[sliceObj], self.frameEnd[sliceObj],
+                             self.header, self.extra, self.file_map)
+
+    def splitTime(self, splitTime):
+        '''
+            Split the 4D temporal image into two 4D temporal images
+
+            Args
+            ----
+                splitTime : float
+                    time at which to split the 4D image. First of the two split
+                    images will not include splitTime. Second of the two split
+                    images will include splitTime.
+        '''
+        firstImg = self.extractTime(self.frameStart[0],splitTime)
+        secondImg = self.extractTime(splitTime, self.frameEnd[-1])
+        return (firstImg, secondImg)
+
+    def dynamicMean(self):
+        # time-weighted dynamic mean
+        meanImg_dat = np.mean(self.get_data() / self.get_frameDuration(), axis=3)
+        meanImg = SpatialImage(np.squeeze(meanImg_dat), self.affine, self.header,
+                                   self.extra, self.file_map)
+        return meanImg
+
+def _csvread_frameTiming(frameTimingCsvFile):
+    from pandas import read_csv
+
+    frameTiming = read_csv(frameTimingCsvFile)
+
+    # check that frameTiming has the required columns
+    for col in ['Duration of time frame (min)','Elapsed time (min)']:
+        if not col in frameTiming.columns:
+            raise IOError('Required column '+col+' is not present in the frame timing spreadsheet '+frameTimingCsvFile+'!')
+
+    frameStart = frameTiming['Elapsed time (min)'] - frameTiming['Duration of time frame (min)']
+    frameEnd = frameTiming['Elapsed time (min)']
+
+    frameStart = frameStart.as_matrix() #tolist()
+    frameEnd = frameEnd.as_matrix() #tolist()
+
+    return (frameStart, frameEnd)
+
+def _csvwrite_frameTiming(frameEnd, frameStart, csvfilename):
+    from pandas import DataFrame
+
+    timingData = DataFrame(data={'Duration of time frame (min)': frameEnd - frameStart,
+                                    'Elapsed time (min)': frameEnd})
+    timingData.to_csv(csvfilename, index=False)
+
+def load(filename, timingfilename, **kwargs):
+    '''
+    Load a temporal image
+
+    Args
+    ----
+    filename : string
+        specification of 4D image file to load
+    timingfilename : string
+        specification of the csv file containing frame timing information
+    '''
+    from nibabel import load as nibload
+    import os.path as op
+
+    if not op.exists(filename):
+        raise FileNotFoundError("No such file: '%s'" % filename)
+
+    if not op.exists(timingfilename):
+        raise FileNotFoundError("No such file: '%s'" % timingfilename)
+
+    img = nibload(filename, **kwargs)
+    frameStart, frameEnd = _csvread_frameTiming(timingfilename)
+
+    return TemporalImage(img.dataobj, img.affine, frameStart, frameEnd,
+                         header=img.header, extra=img.extra,
+                         file_map=img.file_map)
+
+def save(img, filename, csvfilename):
+    '''
+    Save a temporal image
+    '''
+    from nibabel import save as nibsave
+
+    nibsave(img, filename)
+    _csvwrite_frameTiming(img.frameEnd, img.frameStart, csvfilename)
