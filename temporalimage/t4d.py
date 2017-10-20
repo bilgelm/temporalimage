@@ -131,6 +131,29 @@ class TemporalImage(SpatialImage):
         secondImg = self.extractTime(splitTime, self.frameEnd[-1])
         return (firstImg, secondImg)
 
+    def roi_timeseries(self, maskfile):
+        '''
+            Get the mean time activity curve (TAC) within a region of interest (ROI)
+
+            Args
+            ----
+                maskfile : string
+                    mask file name
+        '''
+
+        from nibabel import load as nibload
+
+        mask = nibload(maskfile).get_data().astype(bool)
+
+        if not mask.ndim==3:
+            raise ValueError('Mask must be 4D')
+
+        if not all(self.get_data().shape[:3]==mask.shape):
+            raise ValueError('Mask is not of the same size as the 3D images in temporal image!')
+
+        timeseries = np.mean(self.get_data()[mask],axis=0)
+        return timeseries
+
 def _csvread_frameTiming(csvfilename):
     '''
         Read frame timing information from csv file
