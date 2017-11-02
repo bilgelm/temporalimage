@@ -2,8 +2,8 @@ from nibabel.analyze import SpatialImage
 import numpy as np
 
 class TemporalImage(SpatialImage):
-    def __init__(self, dataobj, affine, frameStart, frameEnd, header=None,
-                 extra=None, file_map=None):
+    def __init__(self, dataobj, affine, frameStart, frameEnd,
+                 header=None, extra=None, file_map=None):
 
         super().__init__(dataobj, affine=affine, header=header,
                          extra=extra, file_map=file_map)
