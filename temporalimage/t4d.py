@@ -146,13 +146,22 @@ class TemporalImage(SpatialImage):
         mask = nibload(maskfile).get_data().astype(bool)
 
         if not mask.ndim==3:
-            raise ValueError('Mask must be 4D')
+            raise ValueError('Mask must be 3D')
 
         if not all(self.get_data().shape[:3]==mask.shape):
             raise ValueError('Mask is not of the same size as the 3D images in temporal image!')
 
         timeseries = np.mean(self.get_data()[mask],axis=0)
         return timeseries
+
+    def dynamic_mean(self):
+        '''
+            Compute the weighted dynamic mean of the 4D temporal image,
+            where each frame is weighted proportionally to its duration
+        '''
+
+        delta = self.get_frameDuration()
+        return np.average(self.get_data(), axis=3, weights=delta)
 
 def _csvread_frameTiming(csvfilename):
     '''
@@ -162,7 +171,7 @@ def _csvread_frameTiming(csvfilename):
 
         Args
         ----
-            frameTimingCsvFile : string
+            csvfilename : string
                 specification of csv file containing frame timing information
     '''
     from pandas import read_csv
@@ -203,6 +212,32 @@ def _csvwrite_frameTiming(frameStart, frameEnd, csvfilename):
                                  'Elapsed time (min)': frameEnd})
     timingData.to_csv(csvfilename, index=False)
 
+def _sifread_frameTiming(siffilename):
+    '''
+        Read frame timing information from sif file
+
+        Args
+        ----
+            siffilename : string
+                specification of sif file containing frame timing information
+    '''
+    raise NotImplementedError()
+
+def _sifwrite_frameTiming(frameStart, frameEnd, siffilename):
+    '''
+        Write frame timing information to sif file
+
+        Args
+        ----
+            frameStart : np.array
+                array of frame start times
+            frameEnd : np.array
+                array of frame end times
+            siffilename : string
+                specification of output sif file
+    '''
+    raise NotImplementedError()
+
 def load(filename, timingfilename, **kwargs):
     '''
     Load a temporal image
@@ -224,13 +259,20 @@ def load(filename, timingfilename, **kwargs):
         raise FileNotFoundError("No such file: '%s'" % timingfilename)
 
     img = nibload(filename, **kwargs)
-    frameStart, frameEnd = _csvread_frameTiming(timingfilename)
+
+    _, timingfileext = op.splitext(timingfilename)
+    if timingfileext=='.csv':
+        frameStart, frameEnd = _csvread_frameTiming(timingfilename)
+    elif timingfileext=='.sif':
+        frameStart, frameEnd = _sifread_frameTiming(timingfilename)
+    else:
+        raise IOError('Timing files with extension ' + timingfileext + ' are not supported')
 
     return TemporalImage(img.dataobj, img.affine, frameStart, frameEnd,
                          header=img.header, extra=img.extra,
                          file_map=img.file_map)
 
-def save(img, filename, csvfilename):
+def save(img, filename, timingfilename):
     '''
     Save a temporal image
 
@@ -240,10 +282,18 @@ def save(img, filename, csvfilename):
             temporal 4D image to save
         filename : string
             specification of output image filename
-        csvfile : string
+        timingfilename : string
             specification of output csv filename for timing information
     '''
     from nibabel import save as nibsave
+    import os.path as op
 
     nibsave(img, filename)
-    _csvwrite_frameTiming(img.frameStart, img.frameEnd, csvfilename)
+
+    _, timingfileext = op.splitext(timingfilename)
+    if timingfileext=='.csv':
+        _csvwrite_frameTiming(img.frameStart, img.frameEnd, timingfilename)
+    elif timingfileext=='.sif':
+        _sifwrite_frameTiming(img.frameStart, img.frameEnd, timingfilename)
+    else:
+        raise IOError('Timing files with extension ' + timingfileext + ' are not supported')
