@@ -2,6 +2,7 @@ import temporalimage
 from .generate_test_data import generate_fake4D
 import os
 import unittest
+import numpy as np
 
 class TestTemporalImageFake4D(unittest.TestCase):
     def setUp(self):
@@ -125,7 +126,6 @@ class TestTemporalImageFake4D(unittest.TestCase):
 
         extr = self.timg.extractTime(startTime, endTime)
         extr_mean = extr.dynamic_mean()
-        
-        self.assertEqual(extr.get_startTime(),extr_mean.get_startTime())
-        self.assertEqual(extr.get_endTime(),extr_mean.get_endTime())
-        self.assertSequenceEqual(extr.get_data(),extr_mean.get_data())
+
+        self.assertSequenceEqual(extr_mean.shape,extr.get_data().shape[:3])
+        self.assertAlmostEqual(np.absolute(extr.get_data()[:,:,:,0]-extr_mean).max(),0)
