@@ -112,3 +112,20 @@ class TestTemporalImageFake4D(unittest.TestCase):
         self.assertEqual(secondImg.get_data().shape[3], 1)
         self.assertEqual(secondImg.get_startTime(), splitTime)
         self.assertEqual(secondImg.get_endTime(), self.timg.get_endTime())
+
+    def test_dynamic_mean_firstFrame(self):
+        '''
+        Silly test where we call dynamic mean on the first time frame and
+        check that the result is equal to the first time frame
+        '''
+        frameEnd = self.timg.get_frameEnd()
+
+        startTime = self.timg.get_startTime()
+        endTime = frameEnd[0]
+
+        extr = self.timg.extractTime(startTime, endTime)
+        extr_mean = extr.dynamic_mean()
+        
+        self.assertEqual(extr.get_startTime(),extr_mean.get_startTime())
+        self.assertEqual(extr.get_endTime(),extr_mean.get_endTime())
+        self.assertSequenceEqual(extr.get_data(),extr_mean.get_data())
