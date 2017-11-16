@@ -20,6 +20,18 @@ class TemporalImage(SpatialImage):
         self.frameStart = np.array(frameStart)
         self.frameEnd = np.array(frameEnd)
 
+    def get_numFrames(self):
+        '''
+            Get number of time frames
+        '''
+        return self.get_data().shape[-1]
+
+    def get_numVoxels(self):
+        '''
+            Get number of voxels in each frame
+        '''
+        return np.prod(self.get_data().shape[:-1])
+
     def get_frameStart(self):
         '''
             Get the array of starting times for each frame
@@ -131,7 +143,7 @@ class TemporalImage(SpatialImage):
         secondImg = self.extractTime(splitTime, self.frameEnd[-1])
         return (firstImg, secondImg)
 
-    def roi_timeseries(self, maskfile):
+    def roi_timeseries(self, maskfile=None, mask=None):
         '''
             Get the mean time activity curve (TAC) within a region of interest (ROI)
 
@@ -139,16 +151,24 @@ class TemporalImage(SpatialImage):
             ----
                 maskfile : string
                     mask file name
+                mask : np.array, boolean
+                    3D mask data matrix
         '''
 
-        from nibabel import load as nibload
+        # Either mask or maskfile must be specified, not both
+        if not (mask is None) ^ (maskfile is None):
+            raise TypeError('Either mask or maskfile must be specified')
 
-        mask = nibload(maskfile).get_data().astype(bool)
+        if mask is None:
+            from nibabel import load as nibload
+            mask = nibload(maskfile).get_data().astype(bool)
+        else:
+            mask = mask.astype(bool)
 
         if not mask.ndim==3:
             raise ValueError('Mask must be 3D')
 
-        if not all(self.get_data().shape[:3]==mask.shape):
+        if not all(self.get_data().shape[:-1]==mask.shape):
             raise ValueError('Mask is not of the same size as the 3D images in temporal image!')
 
         timeseries = np.mean(self.get_data()[mask],axis=0)
@@ -162,6 +182,22 @@ class TemporalImage(SpatialImage):
 
         delta = self.get_frameDuration()
         return np.average(self.get_data(), axis=3, weights=delta)
+
+    def gaussian_filter(self, sigma, **kwargs):
+        '''
+            Perform gaussian filtering of each time point.
+        '''
+
+        # Is this function a good idea?
+        # should it return a TemporalImage instance?
+        # or should it replace the data in self with the smoothed data?
+        from scipy.ndimage import gaussian_filter
+
+        smoothedData = np.zeros_like(self.get_data())
+        for t in range(self.get_numFrames()):
+            smoothedData[:,:,:,t] = gaussian_filter(self.get_data()[:,:,:,t],
+                                                    sigma=sigma,**kwargs)
+        return smoothedData
 
 def _csvread_frameTiming(csvfilename):
     '''
