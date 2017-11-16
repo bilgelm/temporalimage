@@ -10,6 +10,12 @@ class TestTemporalImageFake4D(unittest.TestCase):
         #self.timg = TemporalImage(imgfile, timingfile)
         self.timg = temporalimage.load(imgfile, timingfile)
 
+    def test_get_numVoxels(self):
+        self.assertEqual(self.timg.get_numVoxels(), 10*11*12)
+
+    def test_get_numFrames(self):
+        self.assertEqual(self.timg.get_numFrames(), 7)
+
     def test_get_startTime(self):
         self.assertEqual(0, self.timg.get_startTime())
 
