@@ -33,6 +33,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
+            pip install coverage
 
       - save_cache:
           paths:
@@ -44,7 +45,8 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            python setup.py test
+            coverage run setup.py test
+            bash <(curl -s https://codecov.io/bash)
 
       - store_artifacts:
           path: test-reports
