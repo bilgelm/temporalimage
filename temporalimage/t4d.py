@@ -217,7 +217,7 @@ def _csvread_frameTiming(csvfilename):
     # check that frameTiming has the required columns
     for col in ['Duration of time frame (min)','Elapsed time (min)']:
         if not col in frameTiming.columns:
-            raise IOError('Required column '+col+' is not present in the frame timing spreadsheet '+frameTimingCsvFile+'!')
+            raise IOError('Required column '+col+' is not present in the frame timing spreadsheet '+csvfilename+'!')
 
     frameStart = frameTiming['Elapsed time (min)'] - frameTiming['Duration of time frame (min)']
     frameEnd = frameTiming['Elapsed time (min)']
