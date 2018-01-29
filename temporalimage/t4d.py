@@ -168,7 +168,7 @@ class TemporalImage(SpatialImage):
         if not mask.ndim==3:
             raise ValueError('Mask must be 3D')
 
-        if not all(self.get_data().shape[:-1]==mask.shape):
+        if not self.get_data().shape[:-1]==mask.shape:
             raise ValueError('Mask is not of the same size as the 3D images in temporal image!')
 
         timeseries = np.mean(self.get_data()[mask],axis=0)
