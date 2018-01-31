@@ -14,3 +14,4 @@ Clone this repository to your machine, then type in terminal:
 - [ ] Implement sif support: `_sifread_frameTiming` and `_sifwrite_frameTiming`
 - [ ] Additional tests to increase code coverage
 - [ ] :question: Incorporate unit handling with a package like `pint` :beer:, `units`, `numericalunits`, or `astropy.units`
+- [ ] `nipype` integration
