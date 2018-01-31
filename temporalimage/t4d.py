@@ -174,14 +174,19 @@ class TemporalImage(SpatialImage):
         timeseries = np.mean(self.get_data()[mask],axis=0)
         return timeseries
 
-    def dynamic_mean(self):
+    def dynamic_mean(self, weights=None):
         '''
-            Compute the weighted dynamic mean of the 4D temporal image,
-            where each frame is weighted proportionally to its duration
+            Compute the weighted dynamic mean of the 4D temporal image.
+            If weights=='frameduration', each frame is weighted proportionally
+            to its duration (inverse variance weighting).
         '''
+        if weights is None:
+            dyn_mean = np.average(self.get_data(), axis=3)
+        elif weights=='frameduration':
+            delta = self.get_frameDuration()
+            dyn_mean = np.average(self.get_data(), axis=3, weights=delta)
 
-        delta = self.get_frameDuration()
-        return np.average(self.get_data(), axis=3, weights=delta)
+        return dyn_mean
 
     def gaussian_filter(self, sigma, **kwargs):
         '''
