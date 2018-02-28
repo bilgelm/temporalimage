@@ -2,7 +2,7 @@ from nibabel.analyze import SpatialImage
 import numpy as np
 
 class TemporalImage(SpatialImage):
-    def __init__(self, dataobj, affine, frameStart, frameEnd,
+    def __init__(self, dataobj, affine, frameStart, frameEnd, time_unit=None,
                  header=None, extra=None, file_map=None):
 
         super().__init__(dataobj, affine=affine, header=header,
@@ -17,8 +17,18 @@ class TemporalImage(SpatialImage):
         if not self.get_data().shape[3]==len(frameStart):
             raise ValueError('4th dimension of image must match the number of columns in frame timing file')
 
-        self.frameStart = np.array(frameStart)
-        self.frameEnd = np.array(frameEnd)
+        if time_unit=='s':
+            # convert everything to min
+            frameStart_min = frameStart / 60
+            frameEnd_min = frameEnd / 60
+        elif time_unit=='min':
+            frameStart_min = frameStart
+            frameEnd_min = frameEnd
+        else:
+            raise ValueError('units of time must be either s or min')
+
+        self.frameStart = np.array(frameStart_min)
+        self.frameEnd = np.array(frameEnd_min)
 
     def get_numFrames(self):
         '''
@@ -126,6 +136,7 @@ class TemporalImage(SpatialImage):
 
         return TemporalImage(self.get_data()[:,:,:,sliceObj], self.affine,
                              self.frameStart[sliceObj], self.frameEnd[sliceObj],
+                             self.time_unit,
                              self.header, self.extra, self.file_map)
 
     def splitTime(self, splitTime):
@@ -220,17 +231,23 @@ def _csvread_frameTiming(csvfilename):
     frameTiming = read_csv(csvfilename)
 
     # check that frameTiming has the required columns
-    for col in ['Duration of time frame (min)','Elapsed time (min)']:
-        if not col in frameTiming.columns:
-            raise IOError('Required column '+col+' is not present in the frame timing spreadsheet '+csvfilename+'!')
-
-    frameStart = frameTiming['Elapsed time (min)'] - frameTiming['Duration of time frame (min)']
-    frameEnd = frameTiming['Elapsed time (min)']
+    if all([col in frameTiming.columns for col in ['Duration of time frame (min)','Elapsed time (min)']]):
+        frameStart = frameTiming['Elapsed time (min)'] - frameTiming['Duration of time frame (min)']
+        frameEnd = frameTiming['Elapsed time (min)']
+        time_unit = 'min'
+    elif all([col in frameTiming.columns for col in ['Duration of time frame (s)','Elapsed time (s)']]):
+        frameStart = frameTiming['Elapsed time (s)'] - frameTiming['Duration of time frame (s)']
+        frameEnd = frameTiming['Elapsed time (s)']
+        time_unit = 's'
+    else:
+        raise IOError('Frame timing spreadsheet ' + csvfilename + \
+                      ' must contain two columns, with headers: Duration of time frame (min), Elapsed time (min) ' + \
+                      ' OR Duration of time frame (s), Elapsed time (s)')
 
     frameStart = frameStart.as_matrix() #tolist()
     frameEnd = frameEnd.as_matrix() #tolist()
 
-    return (frameStart, frameEnd)
+    return (frameStart, frameEnd, time_unit)
 
 def _csvwrite_frameTiming(frameStart, frameEnd, csvfilename):
     '''
@@ -262,7 +279,15 @@ def _sifread_frameTiming(siffilename):
             siffilename : string
                 specification of sif file containing frame timing information
     '''
-    raise NotImplementedError()
+    from pandas import read_table
+
+    frameTiming = read_table(siffilename, delim_whitespace=True, skiprows=1, header=None)
+
+    frameStart = frameTiming[0].as_matrix()
+    frameEnd = frameTiming[1].as_matrix()
+    time_unit = 's'
+
+    return (frameStart, frameEnd, time_unit)
 
 def _sifwrite_frameTiming(frameStart, frameEnd, siffilename):
     '''
@@ -303,13 +328,13 @@ def load(filename, timingfilename, **kwargs):
 
     _, timingfileext = op.splitext(timingfilename)
     if timingfileext=='.csv':
-        frameStart, frameEnd = _csvread_frameTiming(timingfilename)
+        frameStart, frameEnd, time_unit = _csvread_frameTiming(timingfilename)
     elif timingfileext=='.sif':
-        frameStart, frameEnd = _sifread_frameTiming(timingfilename)
+        frameStart, frameEnd, time_unit = _sifread_frameTiming(timingfilename)
     else:
         raise IOError('Timing files with extension ' + timingfileext + ' are not supported')
 
-    return TemporalImage(img.dataobj, img.affine, frameStart, frameEnd,
+    return TemporalImage(img.dataobj, img.affine, frameStart, frameEnd, time_unit,
                          header=img.header, extra=img.extra,
                          file_map=img.file_map)
 
