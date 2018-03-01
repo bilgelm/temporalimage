@@ -203,11 +203,20 @@ class TemporalImage(SpatialImage):
     def gaussian_filter(self, sigma, **kwargs):
         '''
             Perform gaussian filtering of each time point.
+            Returns the 4D matrix with smoothed values.
+
+            Args
+            ----
+            sigma : scalar or sequence of scalars
+                Standard deviation for Gaussian kernel (in voxels).
+                The standard deviations of the Gaussian filter are given for
+                each axis as a sequence, or as a single number,
+                in which case it is equal for all of the first three axes.
+
+            Any argument that scipy.ndimage.gaussian_filter takes can also be
+            specified.
         '''
 
-        # Is this function a good idea?
-        # should it return a TemporalImage instance?
-        # or should it replace the data in self with the smoothed data?
         from scipy.ndimage import gaussian_filter
 
         smoothedData = np.zeros_like(self.get_data())
@@ -251,7 +260,7 @@ def _csvread_frameTiming(csvfilename):
 
     return (frameStart, frameEnd, time_unit)
 
-def _csvwrite_frameTiming(frameStart, frameEnd, csvfilename):
+def _csvwrite_frameTiming(frameStart, frameEnd, time_unit, csvfilename):
     '''
         Write frame timing information to csv file
         There will be one column named 'Duration of time frame (min)'
@@ -268,8 +277,8 @@ def _csvwrite_frameTiming(frameStart, frameEnd, csvfilename):
     '''
     from pandas import DataFrame
 
-    timingData = DataFrame(data={'Duration of time frame ('+self.time_unit+')': frameEnd - frameStart,
-                                 'Elapsed time ('+self.time_unit+')': frameEnd})
+    timingData = DataFrame(data={'Duration of time frame ('+time_unit+')': frameEnd - frameStart,
+                                 'Elapsed time ('+time_unit+')': frameEnd})
     timingData.to_csv(csvfilename, index=False)
 
 def _sifread_frameTiming(siffilename):
@@ -291,7 +300,7 @@ def _sifread_frameTiming(siffilename):
 
     return (frameStart, frameEnd, time_unit)
 
-def _sifwrite_frameTiming(frameStart, frameEnd, siffilename):
+def _sifwrite_frameTiming(frameStart, frameEnd, time_unit, siffilename):
     '''
         Write frame timing information to sif file
 
@@ -308,8 +317,8 @@ def _sifwrite_frameTiming(frameStart, frameEnd, siffilename):
     from pandas import DataFrame
 
     # we skip a row for sif header -- not tested
-    timingData = DataFrame(data={'Start of time frame ('+self.time_unit+')': [' '] + frameStart,
-                                 'Elapsed time ('+self.time_unit+')': [' '] + frameEnd})
+    timingData = DataFrame(data={'Start of time frame ('+time_unit+')': [' '] + frameStart,
+                                 'Elapsed time ('+time_unit+')': [' '] + frameEnd})
     timingData.to_csv(siffilename, header=None, index=None, sep=' ', mode='a')
 
 def load(filename, timingfilename, **kwargs):
@@ -366,8 +375,8 @@ def save(img, filename, timingfilename):
 
     _, timingfileext = op.splitext(timingfilename)
     if timingfileext=='.csv':
-        _csvwrite_frameTiming(img.frameStart, img.frameEnd, timingfilename)
+        _csvwrite_frameTiming(img.frameStart, img.frameEnd, img.time_unit, timingfilename)
     elif timingfileext=='.sif':
-        _sifwrite_frameTiming(img.frameStart, img.frameEnd, timingfilename)
+        _sifwrite_frameTiming(img.frameStart, img.frameEnd, img.time_unit, timingfilename)
     else:
         raise IOError('Timing files with extension ' + timingfileext + ' are not supported')
