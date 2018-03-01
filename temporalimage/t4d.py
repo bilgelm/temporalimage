@@ -29,6 +29,7 @@ class TemporalImage(SpatialImage):
 
         self.frameStart = np.array(frameStart_min)
         self.frameEnd = np.array(frameEnd_min)
+        self.time_unit = time_unit
 
     def get_numFrames(self):
         '''
@@ -218,8 +219,9 @@ class TemporalImage(SpatialImage):
 def _csvread_frameTiming(csvfilename):
     '''
         Read frame timing information from csv file
-        There must be one column named 'Duration of time frame (min)'
-        and another named 'Elapsed time (min)'
+        There must be one column named
+            'Duration of time frame (min)' or 'Duration of time frame (s)'
+        and another named 'Elapsed time (min)' or 'Elapsed time (s)'
 
         Args
         ----
@@ -266,8 +268,8 @@ def _csvwrite_frameTiming(frameStart, frameEnd, csvfilename):
     '''
     from pandas import DataFrame
 
-    timingData = DataFrame(data={'Duration of time frame (min)': frameEnd - frameStart,
-                                 'Elapsed time (min)': frameEnd})
+    timingData = DataFrame(data={'Duration of time frame ('+self.time_unit+')': frameEnd - frameStart,
+                                 'Elapsed time ('+self.time_unit+')': frameEnd})
     timingData.to_csv(csvfilename, index=False)
 
 def _sifread_frameTiming(siffilename):
@@ -302,7 +304,13 @@ def _sifwrite_frameTiming(frameStart, frameEnd, siffilename):
             siffilename : string
                 specification of output sif file
     '''
-    raise NotImplementedError()
+
+    from pandas import DataFrame
+
+    # we skip a row for sif header -- not tested
+    timingData = DataFrame(data={'Start of time frame ('+self.time_unit+')': [' '] + frameStart,
+                                 'Elapsed time ('+self.time_unit+')': [' '] + frameEnd})
+    timingData.to_csv(siffilename, header=None, index=None, sep=' ', mode='a')
 
 def load(filename, timingfilename, **kwargs):
     '''
