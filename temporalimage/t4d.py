@@ -180,6 +180,9 @@ class TemporalImage(SpatialImage):
         if not mask.ndim==3:
             raise ValueError('Mask must be 3D')
 
+        if np.sum(mask)<1:
+            raise ValueError('Mask should include as least one >0 voxel')
+
         if not self.get_data().shape[:-1]==mask.shape:
             raise ValueError('Mask is not of the same size as the 3D images in temporal image!')
 

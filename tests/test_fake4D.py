@@ -46,7 +46,7 @@ class TestTemporalImageFake4D(unittest.TestCase):
         endTime = self.timg.get_endTime()
 
         extr = self.timg.extractTime(startTime, endTime)
-        self.assertEqual(extr.get_data().shape[3], 7)
+        self.assertEqual(extr.shape[3], 7)
         self.assertEqual(extr.get_startTime(), startTime)
         self.assertEqual(extr.get_endTime(), endTime)
 
@@ -60,7 +60,7 @@ class TestTemporalImageFake4D(unittest.TestCase):
         endTime = self.timg.get_endTime()
 
         extr = self.timg.extractTime(startTime, endTime)
-        self.assertEqual(extr.get_data().shape[3], len(frameStart) - len(frameStart)//2)
+        self.assertEqual(extr.shape[3], len(frameStart) - len(frameStart)//2)
         self.assertEqual(extr.get_startTime(), startTime)
         self.assertEqual(extr.get_endTime(), endTime)
 
@@ -74,7 +74,7 @@ class TestTemporalImageFake4D(unittest.TestCase):
         endTime = frameEnd[len(frameEnd)//2]
 
         extr = self.timg.extractTime(startTime, endTime)
-        self.assertEqual(extr.get_data().shape[3], len(frameEnd)//2 + 1)
+        self.assertEqual(extr.shape[3], len(frameEnd)//2 + 1)
         self.assertEqual(extr.get_startTime(), startTime)
         self.assertEqual(extr.get_endTime(), endTime)
 
@@ -90,7 +90,7 @@ class TestTemporalImageFake4D(unittest.TestCase):
         endTime = frameEnd[-2]
 
         extr = self.timg.extractTime(startTime, endTime)
-        self.assertEqual(extr.get_data().shape[3], len(frameStart) - 2)
+        self.assertEqual(extr.shape[3], len(frameStart) - 2)
         self.assertEqual(extr.get_startTime(), startTime)
         self.assertEqual(extr.get_endTime(), endTime)
 
@@ -106,7 +106,7 @@ class TestTemporalImageFake4D(unittest.TestCase):
         endTime = frameEnd[-2] - .1
 
         extr = self.timg.extractTime(startTime, endTime)
-        self.assertEqual(extr.get_data().shape[3], len(frameStart) - 4)
+        self.assertEqual(extr.shape[3], len(frameStart) - 4)
         self.assertEqual(extr.get_startTime(), frameStart[2])
         self.assertEqual(extr.get_endTime(), frameEnd[-3])
 
@@ -116,10 +116,10 @@ class TestTemporalImageFake4D(unittest.TestCase):
         '''
         splitTime = self.timg.get_frameStart()[1]
         (firstImg, secondImg) = self.timg.splitTime(splitTime)
-        self.assertEqual(firstImg.get_data().shape[3], 1)
+        self.assertEqual(firstImg.shape[3], 1)
         self.assertEqual(firstImg.get_startTime(), self.timg.get_startTime())
         self.assertEqual(firstImg.get_endTime(), splitTime)
-        self.assertEqual(secondImg.get_data().shape[3], self.timg.get_data().shape[3]-1)
+        self.assertEqual(secondImg.shape[3], self.timg.get_data().shape[3]-1)
         self.assertEqual(secondImg.get_startTime(), splitTime)
         self.assertEqual(secondImg.get_endTime(), self.timg.get_endTime())
 
@@ -129,10 +129,10 @@ class TestTemporalImageFake4D(unittest.TestCase):
         '''
         splitTime = self.timg.get_frameStart()[-1]
         (firstImg, secondImg) = self.timg.splitTime(splitTime)
-        self.assertEqual(firstImg.get_data().shape[3], self.timg.get_data().shape[3]-1)
+        self.assertEqual(firstImg.shape[3], self.timg.shape[3]-1)
         self.assertEqual(firstImg.get_startTime(), self.timg.get_startTime())
         self.assertEqual(firstImg.get_endTime(), splitTime)
-        self.assertEqual(secondImg.get_data().shape[3], 1)
+        self.assertEqual(secondImg.shape[3], 1)
         self.assertEqual(secondImg.get_startTime(), splitTime)
         self.assertEqual(secondImg.get_endTime(), self.timg.get_endTime())
 
@@ -149,11 +149,24 @@ class TestTemporalImageFake4D(unittest.TestCase):
         extr = self.timg.extractTime(startTime, endTime)
         extr_mean = extr.dynamic_mean()
 
-        self.assertSequenceEqual(extr_mean.shape,extr.get_data().shape[:3])
+        self.assertSequenceEqual(extr_mean.shape,extr.shape[:3])
         self.assertAlmostEqual(np.absolute(extr.get_data()[:,:,:,0]-extr_mean).max(),0)
+
+        extr_mean_weighted = extr.dynamic_mean(weights='frameduration')
+        self.assertSequenceEqual(extr_mean_weighted.shape,extr.shape[:3])
+        self.assertAlmostEqual(np.absolute(extr.get_data()[:,:,:,0]-extr_mean_weighted).max(),0)
+
+    def test_dynamic_mean(self):
+        self.timg.dynamic_mean()
+        self.timg.dynamic_mean(weights='frameduration')
 
     def test_gaussian_filter(self):
         self.timg.gaussian_filter(sigma=3)
+
+    def test_roi_timeseries_silly(self):
+        mask = np.ones(self.timg.shape[:-1])
+        self.assertTrue(np.allclose(self.timg.roi_timeseries(mask=mask),
+                                    np.mean(self.timg.get_data(), axis=(0,1,2))))
 
     def test_save(self):
         from tempfile import mkdtemp
