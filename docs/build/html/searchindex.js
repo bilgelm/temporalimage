@@ -1,0 +1,1 @@
+Search.setIndex({docnames:["index"],envversion:51,filenames:["index.rst"],objects:{},objnames:{},objtypes:{},terms:{"function":0,add:0,built:0,data:0,handl:0,imag:0,index:0,modul:0,page:0,search:0,some:0,spatialimag:0},titles:["Welcome to temporalimage&#8217;s documentation!"],titleterms:{document:0,indic:0,tabl:0,temporalimag:0,welcom:0}})
