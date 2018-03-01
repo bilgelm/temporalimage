@@ -22,6 +22,22 @@ class TestTemporalImageFake4D(unittest.TestCase):
     def test_get_endTime(self):
         self.assertEqual(60, self.timg.get_endTime())
 
+    def test_get_frameDuration(self):
+        self.assertTrue(np.allclose(np.array([5,5] + [10]*5),
+                                             self.timg.get_frameDuration()))
+
+    def test_get_frameStart(self):
+        self.assertTrue(np.allclose(np.array([0, 5, 10, 20, 30, 40, 50]),
+                                    self.timg.get_frameStart()))
+
+    def test_get_frameEnd(self):
+        self.assertTrue(np.allclose(np.array([5, 10, 20, 30, 40, 50, 60]),
+                                    self.timg.get_frameEnd()))
+
+    def test_get_midTime(self):
+        self.assertTrue(np.allclose(np.array([2.5, 7.5, 15, 25, 35, 45, 55]),
+                                    self.timg.get_midTime()))
+
     def test_extractTime_silly(self):
         '''
         Silly test where we call extractTime without actually changing the start or end times
@@ -135,3 +151,20 @@ class TestTemporalImageFake4D(unittest.TestCase):
 
         self.assertSequenceEqual(extr_mean.shape,extr.get_data().shape[:3])
         self.assertAlmostEqual(np.absolute(extr.get_data()[:,:,:,0]-extr_mean).max(),0)
+
+    def test_gaussian_filter(self):
+        self.timg.gaussian_filter(sigma=3)
+
+    def test_save(self):
+        from tempfile import mkdtemp
+
+        # make a temporary directory in which to save the temporal image files
+        tmpdirname = mkdtemp()
+
+        imgfilename = os.path.abspath(os.path.join(tmpdirname,'img.nii.gz'))
+        csvfilename = os.path.abspath(os.path.join(tmpdirname,'timingData.csv'))
+        temporalimage.save(self.timg, imgfilename, csvfilename)
+
+        os.remove(imgfilename)
+        os.remove(csvfilename)
+        os.rmdir(tmpdirname)
