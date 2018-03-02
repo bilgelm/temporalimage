@@ -32,60 +32,51 @@ class TemporalImage(SpatialImage):
         self.time_unit = time_unit
 
     def get_numFrames(self):
-        '''
-            Get number of time frames
+        ''' Get number of time frames
         '''
         return self.get_data().shape[-1]
 
     def get_numVoxels(self):
-        '''
-            Get number of voxels in each frame
+        ''' Get number of voxels in each frame
         '''
         return np.prod(self.get_data().shape[:-1])
 
     def get_frameStart(self):
-        '''
-            Get the array of starting times for each frame
+        ''' Get the array of starting times for each frame
         '''
         return self.frameStart
 
     def get_frameEnd(self):
-        '''
-            Get the array of ending times for each frame
+        ''' Get the array of ending times for each frame
         '''
         return self.frameEnd
 
     def get_startTime(self):
-        '''
-            Get the starting time of first frame
+        ''' Get the starting time of first frame
         '''
         return self.frameStart[0]
 
     def get_endTime(self):
-        '''
-            Get the ending time of last frame
+        ''' Get the ending time of last frame
         '''
         return self.frameEnd[-1]
 
     def get_frameDuration(self):
-        '''
-            Get the array of durations for each frame
+        ''' Get the array of durations for each frame
         '''
         # Compute the duration of each time frame
         delta = self.frameEnd - self.frameStart
         return delta
 
     def get_midTime(self):
-        '''
-            Get the array of mid-time point for each frame
+        ''' Get the array of mid-time point for each frame
         '''
         # Compute the time mid-way for each time frame
         t = (self.frameStart + self.frameEnd)/2
         return t
 
     def extractTime(self, startTime, endTime):
-        '''
-        Extract a 4D temporal image from a longer-duration 4D temporal image
+        ''' Extract a 4D temporal image from a longer-duration 4D temporal image
 
         Args
         ----
@@ -141,8 +132,7 @@ class TemporalImage(SpatialImage):
                              self.header, self.extra, self.file_map)
 
     def splitTime(self, splitTime):
-        '''
-            Split the 4D temporal image into two 4D temporal images
+        ''' Split the 4D temporal image into two 4D temporal images
 
             Args
             ----
@@ -156,15 +146,14 @@ class TemporalImage(SpatialImage):
         return (firstImg, secondImg)
 
     def roi_timeseries(self, maskfile=None, mask=None):
-        '''
-            Get the mean time activity curve (TAC) within a region of interest (ROI)
+        ''' Get the mean time activity curve (TAC) within a region of interest (ROI)
 
             Args
             ----
                 maskfile : string
                     mask file name
-                mask : np.array, boolean
-                    3D mask data matrix
+                mask : array_like
+                    3D mask data matrix consisting of bool
         '''
 
         # Either mask or maskfile must be specified, not both
@@ -190,10 +179,13 @@ class TemporalImage(SpatialImage):
         return timeseries
 
     def dynamic_mean(self, weights=None):
-        '''
-            Compute the weighted dynamic mean of the 4D temporal image.
-            If weights=='frameduration', each frame is weighted proportionally
-            to its duration (inverse variance weighting).
+        ''' Compute the weighted dynamic mean of the 4D temporal image.
+
+            Args
+            ----
+                weights : { None, 'frameduration' }
+                    If weights=='frameduration', each frame is weighted
+                    proportionally to its duration (inverse variance weighting).
         '''
         if weights is None:
             dyn_mean = np.average(self.get_data(), axis=3)
@@ -204,9 +196,11 @@ class TemporalImage(SpatialImage):
         return dyn_mean
 
     def gaussian_filter(self, sigma, **kwargs):
-        '''
-            Perform gaussian filtering of each time point.
+        ''' Perform gaussian filtering of each time point.
             Returns the 4D matrix with smoothed values.
+
+            Any argument that scipy.ndimage.gaussian_filter takes can also be
+            specified.
 
             Args
             ----
@@ -216,8 +210,9 @@ class TemporalImage(SpatialImage):
                 each axis as a sequence, or as a single number,
                 in which case it is equal for all of the first three axes.
 
-            Any argument that scipy.ndimage.gaussian_filter takes can also be
-            specified.
+            See Also
+            --------
+            scipy.ndimage.gaussian_filter : Gaussian filtering of 3D image
         '''
 
         from scipy.ndimage import gaussian_filter
@@ -229,8 +224,7 @@ class TemporalImage(SpatialImage):
         return smoothedData
 
 def _csvread_frameTiming(csvfilename):
-    '''
-        Read frame timing information from csv file
+    ''' Read frame timing information from csv file
         There must be one column named
             'Duration of time frame (min)' or 'Duration of time frame (s)'
         and another named 'Elapsed time (min)' or 'Elapsed time (s)'
@@ -264,8 +258,7 @@ def _csvread_frameTiming(csvfilename):
     return (frameStart, frameEnd, time_unit)
 
 def _csvwrite_frameTiming(frameStart, frameEnd, time_unit, csvfilename):
-    '''
-        Write frame timing information to csv file
+    ''' Write frame timing information to csv file
         There will be one column named 'Duration of time frame (min)'
         and another named 'Elapsed time (min)'
 
@@ -285,8 +278,7 @@ def _csvwrite_frameTiming(frameStart, frameEnd, time_unit, csvfilename):
     timingData.to_csv(csvfilename, index=False)
 
 def _sifread_frameTiming(siffilename):
-    '''
-        Read frame timing information from sif file
+    ''' Read frame timing information from sif file
 
         Args
         ----
@@ -304,8 +296,7 @@ def _sifread_frameTiming(siffilename):
     return (frameStart, frameEnd, time_unit)
 
 def _sifwrite_frameTiming(frameStart, frameEnd, time_unit, siffilename):
-    '''
-        Write frame timing information to sif file
+    ''' Write frame timing information to sif file
 
         Args
         ----
@@ -319,14 +310,22 @@ def _sifwrite_frameTiming(frameStart, frameEnd, time_unit, siffilename):
 
     from pandas import DataFrame
 
-    # we skip a row for sif header -- not tested
-    timingData = DataFrame(data={'Start of time frame ('+time_unit+')': [' '] + frameStart,
-                                 'Elapsed time ('+time_unit+')': [' '] + frameEnd})
-    timingData.to_csv(siffilename, header=None, index=None, sep=' ', mode='a')
+    if time_unit=='min':
+        frameStart *= 60
+        frameEnd *= 60
+        time_unit='s'
+
+    if time_unit=='s':
+        # we skip a row for sif header -- not tested
+        timingData = DataFrame(data={'Start of time frame (s)': [' '] + frameStart.tolist(),
+                                     'Elapsed time (s)': [' '] + frameEnd.tolist()})
+        timingData.to_csv(siffilename, header=None, index=None, sep=' ',
+                          columns=['Start of time frame (s)','Elapsed time (s)'])
+    else:
+        raise ValueError('Only min and s time units are supported')
 
 def load(filename, timingfilename, **kwargs):
-    '''
-    Load a temporal image
+    ''' Load a temporal image
 
     Args
     ----
@@ -359,8 +358,7 @@ def load(filename, timingfilename, **kwargs):
                          file_map=img.file_map)
 
 def save(img, filename, timingfilename):
-    '''
-    Save a temporal image
+    ''' Save a temporal image
 
     Args
     ----
