@@ -10,6 +10,8 @@ Welcome to temporalimage's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   modules
+
 temporalimage is built on SpatialImage to add some functionality for handling
 4D image data.
 
