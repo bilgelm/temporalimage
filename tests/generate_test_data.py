@@ -12,11 +12,24 @@ def generate_fake4D():
     frameStart = np.array([0, 5, 10, 20, 30, 40, 50])
     frameEnd = np.append(frameStart[1:], frameStart[-1]+10)
     frameDuration = frameEnd - frameStart
-    timingData = pd.DataFrame(data={'Duration of time frame (min)': frameDuration,
+    timingData_min = pd.DataFrame(data={'Duration of time frame (min)': frameDuration,
                                     'Elapsed time (min)': frameEnd})
-    csvfilename = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                               os.pardir,'data','timingData.csv'))
-    timingData.to_csv(csvfilename, index=False)
+    csvfilename_min = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                               os.pardir,'data','timingData_min.csv'))
+    timingData_min.to_csv(csvfilename_min, index=False)
+
+    timingData_s = pd.DataFrame(data={'Duration of time frame (s)': frameDuration*60,
+                                    'Elapsed time (s)': frameEnd*60})
+    csvfilename_s = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                               os.pardir,'data','timingData_s.csv'))
+    timingData_s.to_csv(csvfilename_s, index=False)
+
+    siffilename = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                               os.pardir,'data','timingData.sif'))
+    timingData_sif = pd.DataFrame(data={'Start of time frame (s)': [' '] + (frameStart*60).tolist(),
+                                        'Elapsed time (s)': [' '] + (frameEnd*60).tolist()})
+    timingData_sif.to_csv(siffilename, header=None, index=None, sep=' ',
+                          columns=['Start of time frame (s)','Elapsed time (s)'])
 
     R1 = 1.0
     DVR = 1.2
@@ -42,4 +55,4 @@ def generate_fake4D():
                                                os.pardir,'data','img.nii.gz'))
     nib.save(img, imgfilename)
 
-    return (imgfilename, csvfilename)
+    return (imgfilename, csvfilename_min, csvfilename_s, siffilename)

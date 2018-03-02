@@ -6,9 +6,11 @@ import numpy as np
 
 class TestTemporalImageFake4D(unittest.TestCase):
     def setUp(self):
-        imgfile, timingfile = generate_fake4D()
+        imgfile, timingfile, timingfile_s, timingfile_sif = generate_fake4D()
         #self.timg = TemporalImage(imgfile, timingfile)
         self.timg = temporalimage.load(imgfile, timingfile)
+        self.timg_s = temporalimage.load(imgfile, timingfile_s)
+        self.timg_sif = temporalimage.load(imgfile, timingfile_sif)
 
     def test_get_numVoxels(self):
         self.assertEqual(self.timg.get_numVoxels(), 10*11*12)
@@ -181,3 +183,16 @@ class TestTemporalImageFake4D(unittest.TestCase):
         os.remove(imgfilename)
         os.remove(csvfilename)
         os.rmdir(tmpdirname)
+    '''
+    def test_sifwrite(self):
+        from tempfile import mkdtemp
+
+        # make a temporary directory in which to save the temporal image files
+        tmpdirname = mkdtemp()
+        siffilename = os.path.abspath(os.path.join(tmpdirname,'timingData.sif'))
+        temporalimage._sifwrite_frameTiming(self.timg.get_frameStart(),
+                                            self.timg.get_frameEnd(),
+                                            self.timg.time_unit, siffilename)
+        os.remove(siffilename)
+        os.rmdir(tmpdirname)
+    '''
