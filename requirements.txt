@@ -2,4 +2,3 @@ nibabel
 pandas
 scipy
 numpy
-sphinxcontrib-napoleon
