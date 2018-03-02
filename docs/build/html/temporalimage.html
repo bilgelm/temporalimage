@@ -2,16 +2,12 @@
 
 <!doctype html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>temporalimage package &#8212; temporalimage 0.1.0 documentation</title>
-    
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -33,7 +29,7 @@
     <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
     <![endif]-->
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -102,7 +98,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>weights</strong> (<em>{ None</em><em>, </em><em>'frameduration' }</em>) &#8211; If weights==&#8217;frameduration&#8217;, each frame is weighted
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>weights</strong> (<em>{ None, ‘frameduration’ }</em>) – If weights==’frameduration’, each frame is weighted
 proportionally to its duration (inverse variance weighting).</td>
 </tr>
 </tbody>
@@ -118,8 +114,8 @@ proportionally to its duration (inverse variance weighting).</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>startTime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; time at which to begin, inclusive</li>
-<li><strong>endTime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; time at which to stop, exclusive</li>
+<li><strong>startTime</strong> (<em>float</em>) – time at which to begin, inclusive</li>
+<li><strong>endTime</strong> (<em>float</em>) – time at which to stop, exclusive</li>
 </ul>
 </td>
 </tr>
@@ -138,7 +134,7 @@ specified.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sigma</strong> (<em>scalar</em><em> or </em><em>sequence of scalars</em>) &#8211; Standard deviation for Gaussian kernel (in voxels).
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sigma</strong> (<em>scalar or sequence of scalars</em>) – Standard deviation for Gaussian kernel (in voxels).
 The standard deviations of the Gaussian filter are given for
 each axis as a sequence, or as a single number,
 in which case it is equal for all of the first three axes.</td>
@@ -211,8 +207,8 @@ in which case it is equal for all of the first three axes.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>maskfile</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; mask file name</li>
-<li><strong>mask</strong> (<em>array_like</em>) &#8211; 3D mask data matrix consisting of bool</li>
+<li><strong>maskfile</strong> (<em>string</em>) – mask file name</li>
+<li><strong>mask</strong> (<em>array_like</em>) – 3D mask data matrix consisting of bool</li>
 </ul>
 </td>
 </tr>
@@ -228,7 +224,7 @@ in which case it is equal for all of the first three axes.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>splitTime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; time at which to split the 4D image. First of the two split
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>splitTime</strong> (<em>float</em>) – time at which to split the 4D image. First of the two split
 images will not include splitTime. Second of the two split
 images will include splitTime.</td>
 </tr>
@@ -247,8 +243,8 @@ images will include splitTime.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; specification of 4D image file to load</li>
-<li><strong>timingfilename</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; specification of the csv file containing frame timing information</li>
+<li><strong>filename</strong> (<em>string</em>) – specification of 4D image file to load</li>
+<li><strong>timingfilename</strong> (<em>string</em>) – specification of the csv file containing frame timing information</li>
 </ul>
 </td>
 </tr>
@@ -265,9 +261,9 @@ images will include splitTime.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>img</strong> (<a class="reference internal" href="#temporalimage.t4d.TemporalImage" title="temporalimage.t4d.TemporalImage"><em>TemporalImage</em></a>) &#8211; temporal 4D image to save</li>
-<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; specification of output image filename</li>
-<li><strong>timingfilename</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; specification of output csv filename for timing information</li>
+<li><strong>img</strong> (<em>TemporalImage</em>) – temporal 4D image to save</li>
+<li><strong>filename</strong> (<em>string</em>) – specification of output image filename</li>
+<li><strong>timingfilename</strong> (<em>string</em>) – specification of output csv filename for timing information</li>
 </ul>
 </td>
 </tr>
@@ -300,7 +296,7 @@ images will include splitTime.</td>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>
