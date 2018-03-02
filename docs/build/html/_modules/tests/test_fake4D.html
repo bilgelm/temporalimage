@@ -1,0 +1,293 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tests.test_fake4D &#8212; temporalimage 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">temporalimage 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tests.test_fake4D</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">temporalimage</span>
+<span class="kn">from</span> <span class="nn">.generate_test_data</span> <span class="k">import</span> <span class="n">generate_fake4D</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D">[docs]</a><span class="k">class</span> <span class="nc">TestTemporalImageFake4D</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestTemporalImageFake4D.setUp"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">imgfile</span><span class="p">,</span> <span class="n">timingfile</span><span class="p">,</span> <span class="n">timingfile_s</span><span class="p">,</span> <span class="n">timingfile_sif</span> <span class="o">=</span> <span class="n">generate_fake4D</span><span class="p">()</span>
+        <span class="c1">#self.timg = TemporalImage(imgfile, timingfile)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timg</span> <span class="o">=</span> <span class="n">temporalimage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">imgfile</span><span class="p">,</span> <span class="n">timingfile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timg_s</span> <span class="o">=</span> <span class="n">temporalimage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">imgfile</span><span class="p">,</span> <span class="n">timingfile_s</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timg_sif</span> <span class="o">=</span> <span class="n">temporalimage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">imgfile</span><span class="p">,</span> <span class="n">timingfile_sif</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_get_numVoxels"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_get_numVoxels">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_numVoxels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_numVoxels</span><span class="p">(),</span> <span class="mi">10</span><span class="o">*</span><span class="mi">11</span><span class="o">*</span><span class="mi">12</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_get_numFrames"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_get_numFrames">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_numFrames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_numFrames</span><span class="p">(),</span> <span class="mi">7</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_get_startTime"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_get_startTime">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_startTime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_get_endTime"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_get_endTime">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_endTime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_get_frameDuration"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_get_frameDuration">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_frameDuration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">*</span><span class="mi">5</span><span class="p">),</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameDuration</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_get_frameStart"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_get_frameStart">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_frameStart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">]),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameStart</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_get_frameEnd"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_get_frameEnd">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_frameEnd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">]),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameEnd</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_get_midTime"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_get_midTime">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_midTime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">55</span><span class="p">]),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_midTime</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_extractTime_silly"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_extractTime_silly">[docs]</a>    <span class="k">def</span> <span class="nf">test_extractTime_silly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Silly test where we call extractTime without actually changing the start or end times</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">()</span>
+        <span class="n">endTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">()</span>
+
+        <span class="n">extr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">extractTime</span><span class="p">(</span><span class="n">startTime</span><span class="p">,</span> <span class="n">endTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">(),</span> <span class="n">startTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">(),</span> <span class="n">endTime</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_extractTime_secondHalf"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_extractTime_secondHalf">[docs]</a>    <span class="k">def</span> <span class="nf">test_extractTime_secondHalf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Extract second half</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">frameStart</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameStart</span><span class="p">()</span>
+
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">frameStart</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">frameStart</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">endTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">()</span>
+
+        <span class="n">extr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">extractTime</span><span class="p">(</span><span class="n">startTime</span><span class="p">,</span> <span class="n">endTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">frameStart</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">frameStart</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">(),</span> <span class="n">startTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">(),</span> <span class="n">endTime</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_extractTime_firstHalf"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_extractTime_firstHalf">[docs]</a>    <span class="k">def</span> <span class="nf">test_extractTime_firstHalf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Extract first half</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">frameEnd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameEnd</span><span class="p">()</span>
+
+        <span class="n">startTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">()</span>
+        <span class="n">endTime</span> <span class="o">=</span> <span class="n">frameEnd</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">frameEnd</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">extr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">extractTime</span><span class="p">(</span><span class="n">startTime</span><span class="p">,</span> <span class="n">endTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">frameEnd</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">(),</span> <span class="n">startTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">(),</span> <span class="n">endTime</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_extractTime_middle"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_extractTime_middle">[docs]</a>    <span class="k">def</span> <span class="nf">test_extractTime_middle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Extract the middle portion</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">frameStart</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameStart</span><span class="p">()</span>
+        <span class="n">frameEnd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameEnd</span><span class="p">()</span>
+
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">frameStart</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">endTime</span> <span class="o">=</span> <span class="n">frameEnd</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">extr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">extractTime</span><span class="p">(</span><span class="n">startTime</span><span class="p">,</span> <span class="n">endTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">frameStart</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">(),</span> <span class="n">startTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">(),</span> <span class="n">endTime</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_extractTime_middle_fuzzy"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_extractTime_middle_fuzzy">[docs]</a>    <span class="k">def</span> <span class="nf">test_extractTime_middle_fuzzy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Extract the middle portion, fuzzy</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">frameStart</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameStart</span><span class="p">()</span>
+        <span class="n">frameEnd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameEnd</span><span class="p">()</span>
+
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">frameStart</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="o">.</span><span class="mi">1</span>
+        <span class="n">endTime</span> <span class="o">=</span> <span class="n">frameEnd</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="o">.</span><span class="mi">1</span>
+
+        <span class="n">extr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">extractTime</span><span class="p">(</span><span class="n">startTime</span><span class="p">,</span> <span class="n">endTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">frameStart</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">(),</span> <span class="n">frameStart</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">(),</span> <span class="n">frameEnd</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_splitTime_first"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_splitTime_first">[docs]</a>    <span class="k">def</span> <span class="nf">test_splitTime_first</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Split after first frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">splitTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameStart</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">(</span><span class="n">firstImg</span><span class="p">,</span> <span class="n">secondImg</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">splitTime</span><span class="p">(</span><span class="n">splitTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstImg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstImg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstImg</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">(),</span> <span class="n">splitTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">secondImg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">secondImg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">(),</span> <span class="n">splitTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">secondImg</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_splitTime_last"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_splitTime_last">[docs]</a>    <span class="k">def</span> <span class="nf">test_splitTime_last</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Split before last frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">splitTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameStart</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">(</span><span class="n">firstImg</span><span class="p">,</span> <span class="n">secondImg</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">splitTime</span><span class="p">(</span><span class="n">splitTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstImg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstImg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstImg</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">(),</span> <span class="n">splitTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">secondImg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">secondImg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">(),</span> <span class="n">splitTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">secondImg</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_endTime</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_dynamic_mean_firstFrame"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_dynamic_mean_firstFrame">[docs]</a>    <span class="k">def</span> <span class="nf">test_dynamic_mean_firstFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Silly test where we call dynamic mean on the first time frame and</span>
+<span class="sd">        check that the result is equal to the first time frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">frameEnd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_frameEnd</span><span class="p">()</span>
+
+        <span class="n">startTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_startTime</span><span class="p">()</span>
+        <span class="n">endTime</span> <span class="o">=</span> <span class="n">frameEnd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">extr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">extractTime</span><span class="p">(</span><span class="n">startTime</span><span class="p">,</span> <span class="n">endTime</span><span class="p">)</span>
+        <span class="n">extr_mean</span> <span class="o">=</span> <span class="n">extr</span><span class="o">.</span><span class="n">dynamic_mean</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertSequenceEqual</span><span class="p">(</span><span class="n">extr_mean</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">extr</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_data</span><span class="p">()[:,:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">extr_mean</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">extr_mean_weighted</span> <span class="o">=</span> <span class="n">extr</span><span class="o">.</span><span class="n">dynamic_mean</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s1">&#39;frameduration&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertSequenceEqual</span><span class="p">(</span><span class="n">extr_mean_weighted</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">extr</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">extr</span><span class="o">.</span><span class="n">get_data</span><span class="p">()[:,:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">extr_mean_weighted</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_dynamic_mean"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_dynamic_mean">[docs]</a>    <span class="k">def</span> <span class="nf">test_dynamic_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">dynamic_mean</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">dynamic_mean</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s1">&#39;frameduration&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_gaussian_filter"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_gaussian_filter">[docs]</a>    <span class="k">def</span> <span class="nf">test_gaussian_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">gaussian_filter</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_roi_timeseries_silly"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_roi_timeseries_silly">[docs]</a>    <span class="k">def</span> <span class="nf">test_roi_timeseries_silly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">roi_timeseries</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">),</span>
+                                    <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="o">.</span><span class="n">get_data</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))))</span></div>
+
+<div class="viewcode-block" id="TestTemporalImageFake4D.test_save"><a class="viewcode-back" href="../../tests.html#tests.test_fake4D.TestTemporalImageFake4D.test_save">[docs]</a>    <span class="k">def</span> <span class="nf">test_save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">tempfile</span> <span class="k">import</span> <span class="n">mkdtemp</span>
+
+        <span class="c1"># make a temporary directory in which to save the temporal image files</span>
+        <span class="n">tmpdirname</span> <span class="o">=</span> <span class="n">mkdtemp</span><span class="p">()</span>
+
+        <span class="n">imgfilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdirname</span><span class="p">,</span><span class="s1">&#39;img.nii.gz&#39;</span><span class="p">))</span>
+        <span class="n">csvfilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdirname</span><span class="p">,</span><span class="s1">&#39;timingData.csv&#39;</span><span class="p">))</span>
+        <span class="n">temporalimage</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timg</span><span class="p">,</span> <span class="n">imgfilename</span><span class="p">,</span> <span class="n">csvfilename</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">imgfilename</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">csvfilename</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">tmpdirname</span><span class="p">)</span></div>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    def test_sifwrite(self):</span>
+<span class="sd">        from tempfile import mkdtemp</span>
+
+<span class="sd">        # make a temporary directory in which to save the temporal image files</span>
+<span class="sd">        tmpdirname = mkdtemp()</span>
+<span class="sd">        siffilename = os.path.abspath(os.path.join(tmpdirname,&#39;timingData.sif&#39;))</span>
+<span class="sd">        temporalimage._sifwrite_frameTiming(self.timg.get_frameStart(),</span>
+<span class="sd">                                            self.timg.get_frameEnd(),</span>
+<span class="sd">                                            self.timg.time_unit, siffilename)</span>
+<span class="sd">        os.remove(siffilename)</span>
+<span class="sd">        os.rmdir(tmpdirname)</span>
+<span class="sd">    &#39;&#39;&#39;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">temporalimage 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+    </div>
+  </body>
+</html>

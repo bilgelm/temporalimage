@@ -1,0 +1,306 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>temporalimage package &#8212; temporalimage 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">temporalimage 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">temporalimage package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-temporalimage.t4d">temporalimage.t4d module</a></li>
+<li><a class="reference internal" href="#module-temporalimage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/temporalimage.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="temporalimage-package">
+<h1>temporalimage package<a class="headerlink" href="#temporalimage-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-temporalimage.t4d">
+<span id="temporalimage-t4d-module"></span><h2>temporalimage.t4d module<a class="headerlink" href="#module-temporalimage.t4d" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="temporalimage.t4d.TemporalImage">
+<em class="property">class </em><code class="descclassname">temporalimage.t4d.</code><code class="descname">TemporalImage</code><span class="sig-paren">(</span><em>dataobj</em>, <em>affine</em>, <em>frameStart</em>, <em>frameEnd</em>, <em>time_unit=None</em>, <em>header=None</em>, <em>extra=None</em>, <em>file_map=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">nibabel.spatialimages.SpatialImage</span></code></p>
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.dynamic_mean">
+<code class="descname">dynamic_mean</code><span class="sig-paren">(</span><em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.dynamic_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.dynamic_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the weighted dynamic mean of the 4D temporal image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>weights</strong> (<em>{ None</em><em>, </em><em>'frameduration' }</em>) &#8211; If weights==&#8217;frameduration&#8217;, each frame is weighted
+proportionally to its duration (inverse variance weighting).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.extractTime">
+<code class="descname">extractTime</code><span class="sig-paren">(</span><em>startTime</em>, <em>endTime</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.extractTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.extractTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a 4D temporal image from a longer-duration 4D temporal image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>startTime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; time at which to begin, inclusive</li>
+<li><strong>endTime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; time at which to stop, exclusive</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.gaussian_filter">
+<code class="descname">gaussian_filter</code><span class="sig-paren">(</span><em>sigma</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.gaussian_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.gaussian_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform gaussian filtering of each time point.
+Returns the 4D matrix with smoothed values.</p>
+<p>Any argument that scipy.ndimage.gaussian_filter takes can also be
+specified.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sigma</strong> (<em>scalar</em><em> or </em><em>sequence of scalars</em>) &#8211; Standard deviation for Gaussian kernel (in voxels).
+The standard deviations of the Gaussian filter are given for
+each axis as a sequence, or as a single number,
+in which case it is equal for all of the first three axes.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-meth docutils literal"><span class="pre">scipy.ndimage.gaussian_filter()</span></code></dt>
+<dd>Gaussian filtering of 3D image</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.get_endTime">
+<code class="descname">get_endTime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.get_endTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.get_endTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ending time of last frame</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.get_frameDuration">
+<code class="descname">get_frameDuration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.get_frameDuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.get_frameDuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the array of durations for each frame</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.get_frameEnd">
+<code class="descname">get_frameEnd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.get_frameEnd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.get_frameEnd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the array of ending times for each frame</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.get_frameStart">
+<code class="descname">get_frameStart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.get_frameStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.get_frameStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the array of starting times for each frame</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.get_midTime">
+<code class="descname">get_midTime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.get_midTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.get_midTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the array of mid-time point for each frame</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.get_numFrames">
+<code class="descname">get_numFrames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.get_numFrames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.get_numFrames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of time frames</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.get_numVoxels">
+<code class="descname">get_numVoxels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.get_numVoxels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.get_numVoxels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of voxels in each frame</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.get_startTime">
+<code class="descname">get_startTime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.get_startTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.get_startTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the starting time of first frame</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.roi_timeseries">
+<code class="descname">roi_timeseries</code><span class="sig-paren">(</span><em>maskfile=None</em>, <em>mask=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.roi_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.roi_timeseries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the mean time activity curve (TAC) within a region of interest (ROI)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>maskfile</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; mask file name</li>
+<li><strong>mask</strong> (<em>array_like</em>) &#8211; 3D mask data matrix consisting of bool</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="temporalimage.t4d.TemporalImage.splitTime">
+<code class="descname">splitTime</code><span class="sig-paren">(</span><em>splitTime</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#TemporalImage.splitTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.TemporalImage.splitTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split the 4D temporal image into two 4D temporal images</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>splitTime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; time at which to split the 4D image. First of the two split
+images will not include splitTime. Second of the two split
+images will include splitTime.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="temporalimage.t4d.load">
+<code class="descclassname">temporalimage.t4d.</code><code class="descname">load</code><span class="sig-paren">(</span><em>filename</em>, <em>timingfilename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a temporal image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; specification of 4D image file to load</li>
+<li><strong>timingfilename</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; specification of the csv file containing frame timing information</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="temporalimage.t4d.save">
+<code class="descclassname">temporalimage.t4d.</code><code class="descname">save</code><span class="sig-paren">(</span><em>img</em>, <em>filename</em>, <em>timingfilename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/temporalimage/t4d.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#temporalimage.t4d.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a temporal image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>img</strong> (<a class="reference internal" href="#temporalimage.t4d.TemporalImage" title="temporalimage.t4d.TemporalImage"><em>TemporalImage</em></a>) &#8211; temporal 4D image to save</li>
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; specification of output image filename</li>
+<li><strong>timingfilename</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) &#8211; specification of output csv filename for timing information</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-temporalimage">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-temporalimage" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">temporalimage 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+    </div>
+  </body>
+</html>

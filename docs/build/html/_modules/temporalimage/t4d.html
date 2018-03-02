@@ -1,0 +1,478 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>temporalimage.t4d &#8212; temporalimage 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">temporalimage 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for temporalimage.t4d</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">nibabel.analyze</span> <span class="k">import</span> <span class="n">SpatialImage</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="TemporalImage"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage">[docs]</a><span class="k">class</span> <span class="nc">TemporalImage</span><span class="p">(</span><span class="n">SpatialImage</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataobj</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">frameStart</span><span class="p">,</span> <span class="n">frameEnd</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_map</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataobj</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
+                         <span class="n">extra</span><span class="o">=</span><span class="n">extra</span><span class="p">,</span> <span class="n">file_map</span><span class="o">=</span><span class="n">file_map</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span><span class="o">.</span><span class="n">ndim</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Image must be 4D&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">frameStart</span><span class="p">)</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">frameEnd</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;There should be equal number of frame start and frame end times&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">frameStart</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;4th dimension of image must match the number of columns in frame timing file&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">time_unit</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">:</span>
+            <span class="c1"># convert everything to min</span>
+            <span class="n">frameStart_min</span> <span class="o">=</span> <span class="n">frameStart</span> <span class="o">/</span> <span class="mi">60</span>
+            <span class="n">frameEnd_min</span> <span class="o">=</span> <span class="n">frameEnd</span> <span class="o">/</span> <span class="mi">60</span>
+        <span class="k">elif</span> <span class="n">time_unit</span><span class="o">==</span><span class="s1">&#39;min&#39;</span><span class="p">:</span>
+            <span class="n">frameStart_min</span> <span class="o">=</span> <span class="n">frameStart</span>
+            <span class="n">frameEnd_min</span> <span class="o">=</span> <span class="n">frameEnd</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;units of time must be either s or min&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frameStart_min</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frameEnd_min</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span> <span class="o">=</span> <span class="n">time_unit</span>
+
+<div class="viewcode-block" id="TemporalImage.get_numFrames"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.get_numFrames">[docs]</a>    <span class="k">def</span> <span class="nf">get_numFrames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Get number of time frames</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TemporalImage.get_numVoxels"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.get_numVoxels">[docs]</a>    <span class="k">def</span> <span class="nf">get_numVoxels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Get number of voxels in each frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TemporalImage.get_frameStart"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.get_frameStart">[docs]</a>    <span class="k">def</span> <span class="nf">get_frameStart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Get the array of starting times for each frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span></div>
+
+<div class="viewcode-block" id="TemporalImage.get_frameEnd"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.get_frameEnd">[docs]</a>    <span class="k">def</span> <span class="nf">get_frameEnd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Get the array of ending times for each frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span></div>
+
+<div class="viewcode-block" id="TemporalImage.get_startTime"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.get_startTime">[docs]</a>    <span class="k">def</span> <span class="nf">get_startTime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Get the starting time of first frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TemporalImage.get_endTime"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.get_endTime">[docs]</a>    <span class="k">def</span> <span class="nf">get_endTime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Get the ending time of last frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TemporalImage.get_frameDuration"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.get_frameDuration">[docs]</a>    <span class="k">def</span> <span class="nf">get_frameDuration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Get the array of durations for each frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Compute the duration of each time frame</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span>
+        <span class="k">return</span> <span class="n">delta</span></div>
+
+<div class="viewcode-block" id="TemporalImage.get_midTime"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.get_midTime">[docs]</a>    <span class="k">def</span> <span class="nf">get_midTime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Get the array of mid-time point for each frame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Compute the time mid-way for each time frame</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+        <span class="k">return</span> <span class="n">t</span></div>
+
+<div class="viewcode-block" id="TemporalImage.extractTime"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.extractTime">[docs]</a>    <span class="k">def</span> <span class="nf">extractTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startTime</span><span class="p">,</span> <span class="n">endTime</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Extract a 4D temporal image from a longer-duration 4D temporal image</span>
+
+<span class="sd">        Args</span>
+<span class="sd">        ----</span>
+<span class="sd">            startTime : float</span>
+<span class="sd">                time at which to begin, inclusive</span>
+<span class="sd">            endTime : float</span>
+<span class="sd">                time at which to stop, exclusive</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="kn">import</span> <span class="nn">warnings</span>
+
+        <span class="k">if</span> <span class="n">startTime</span> <span class="o">&gt;=</span> <span class="n">endTime</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Start time must be before end time&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">startTime</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">startTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Specified start time is before the start time of the first frame. &quot;</span> <span class="o">+</span>
+                          <span class="s2">&quot;Constraining start time to be the start time of the first frame.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">startTime</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Start time is beyond the time covered by the time series data!&#39;</span><span class="p">)</span>
+
+        <span class="c1"># find the first time frame with frameStart at or shortest after the specified start time</span>
+        <span class="n">startIndex</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span><span class="o">&gt;=</span><span class="n">startTime</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">endTime</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">endTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Specified end time is beyond the end time of the last frame. &quot;</span> <span class="o">+</span>
+                          <span class="s2">&quot;Constraining end time to be the end time of the last frame.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">endTime</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;End time is prior to the time covered by the time series data!&#39;</span><span class="p">)</span>
+
+        <span class="c1"># find the first time frame with frameEnd shortest after the specified end time</span>
+        <span class="n">endIndex</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span><span class="o">&gt;</span><span class="n">endTime</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">))</span>
+
+
+        <span class="c1"># another sanity check, mainly to make sure that startIndex!=endIndex</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">startIndex</span><span class="o">&lt;</span><span class="n">endIndex</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Start index must be smaller than end index&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">[</span><span class="n">startIndex</span><span class="p">]</span><span class="o">==</span><span class="n">startTime</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Specified start time &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">startTime</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; did not match the start time of any of the frames. &quot;</span> <span class="o">+</span>
+                          <span class="s2">&quot;Using &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">[</span><span class="n">startIndex</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot; as start time instead.&quot;</span><span class="p">,</span>
+                          <span class="ne">RuntimeWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">[</span><span class="n">endIndex</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">endTime</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Specified end time &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">endTime</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; did not match the end time of any of the frames. &quot;</span> <span class="o">+</span>
+                          <span class="s2">&quot;Using &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">[</span><span class="n">endIndex</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot; as end time instead.&quot;</span><span class="p">,</span>
+                          <span class="ne">RuntimeWarning</span><span class="p">)</span>
+
+        <span class="n">sliceObj</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">startIndex</span><span class="p">,</span><span class="n">endIndex</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">TemporalImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()[:,:,:,</span><span class="n">sliceObj</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">[</span><span class="n">sliceObj</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">[</span><span class="n">sliceObj</span><span class="p">],</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_map</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TemporalImage.splitTime"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.splitTime">[docs]</a>    <span class="k">def</span> <span class="nf">splitTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">splitTime</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Split the 4D temporal image into two 4D temporal images</span>
+
+<span class="sd">            Args</span>
+<span class="sd">            ----</span>
+<span class="sd">                splitTime : float</span>
+<span class="sd">                    time at which to split the 4D image. First of the two split</span>
+<span class="sd">                    images will not include splitTime. Second of the two split</span>
+<span class="sd">                    images will include splitTime.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">firstImg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractTime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameStart</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">splitTime</span><span class="p">)</span>
+        <span class="n">secondImg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractTime</span><span class="p">(</span><span class="n">splitTime</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">firstImg</span><span class="p">,</span> <span class="n">secondImg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TemporalImage.roi_timeseries"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.roi_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">roi_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maskfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Get the mean time activity curve (TAC) within a region of interest (ROI)</span>
+
+<span class="sd">            Args</span>
+<span class="sd">            ----</span>
+<span class="sd">                maskfile : string</span>
+<span class="sd">                    mask file name</span>
+<span class="sd">                mask : array_like</span>
+<span class="sd">                    3D mask data matrix consisting of bool</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># Either mask or maskfile must be specified, not both</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">maskfile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Either mask or maskfile must be specified&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">nibabel</span> <span class="k">import</span> <span class="n">load</span> <span class="k">as</span> <span class="n">nibload</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">nibload</span><span class="p">(</span><span class="n">maskfile</span><span class="p">)</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">ndim</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Mask must be 3D&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Mask should include as least one &gt;0 voxel&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Mask is not of the same size as the 3D images in temporal image!&#39;</span><span class="p">)</span>
+
+        <span class="n">timeseries</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()[</span><span class="n">mask</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">timeseries</span></div>
+
+<div class="viewcode-block" id="TemporalImage.dynamic_mean"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.dynamic_mean">[docs]</a>    <span class="k">def</span> <span class="nf">dynamic_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Compute the weighted dynamic mean of the 4D temporal image.</span>
+
+<span class="sd">            Args</span>
+<span class="sd">            ----</span>
+<span class="sd">                weights : { None, &#39;frameduration&#39; }</span>
+<span class="sd">                    If weights==&#39;frameduration&#39;, each frame is weighted</span>
+<span class="sd">                    proportionally to its duration (inverse variance weighting).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dyn_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">weights</span><span class="o">==</span><span class="s1">&#39;frameduration&#39;</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frameDuration</span><span class="p">()</span>
+            <span class="n">dyn_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">delta</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dyn_mean</span></div>
+
+<div class="viewcode-block" id="TemporalImage.gaussian_filter"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.TemporalImage.gaussian_filter">[docs]</a>    <span class="k">def</span> <span class="nf">gaussian_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Perform gaussian filtering of each time point.</span>
+<span class="sd">            Returns the 4D matrix with smoothed values.</span>
+
+<span class="sd">            Any argument that scipy.ndimage.gaussian_filter takes can also be</span>
+<span class="sd">            specified.</span>
+
+<span class="sd">            Args</span>
+<span class="sd">            ----</span>
+<span class="sd">            sigma : scalar or sequence of scalars</span>
+<span class="sd">                Standard deviation for Gaussian kernel (in voxels).</span>
+<span class="sd">                The standard deviations of the Gaussian filter are given for</span>
+<span class="sd">                each axis as a sequence, or as a single number,</span>
+<span class="sd">                in which case it is equal for all of the first three axes.</span>
+
+<span class="sd">            See Also</span>
+<span class="sd">            --------</span>
+<span class="sd">            scipy.ndimage.gaussian_filter : Gaussian filtering of 3D image</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="k">import</span> <span class="n">gaussian_filter</span>
+
+        <span class="n">smoothedData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_numFrames</span><span class="p">()):</span>
+            <span class="n">smoothedData</span><span class="p">[:,:,:,</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()[:,:,:,</span><span class="n">t</span><span class="p">],</span>
+                                                    <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">smoothedData</span></div></div>
+
+<span class="k">def</span> <span class="nf">_csvread_frameTiming</span><span class="p">(</span><span class="n">csvfilename</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Read frame timing information from csv file</span>
+<span class="sd">        There must be one column named</span>
+<span class="sd">            &#39;Duration of time frame (min)&#39; or &#39;Duration of time frame (s)&#39;</span>
+<span class="sd">        and another named &#39;Elapsed time (min)&#39; or &#39;Elapsed time (s)&#39;</span>
+
+<span class="sd">        Args</span>
+<span class="sd">        ----</span>
+<span class="sd">            csvfilename : string</span>
+<span class="sd">                specification of csv file containing frame timing information</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">read_csv</span>
+
+    <span class="n">frameTiming</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">csvfilename</span><span class="p">)</span>
+
+    <span class="c1"># check that frameTiming has the required columns</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">col</span> <span class="ow">in</span> <span class="n">frameTiming</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Duration of time frame (min)&#39;</span><span class="p">,</span><span class="s1">&#39;Elapsed time (min)&#39;</span><span class="p">]]):</span>
+        <span class="n">frameStart</span> <span class="o">=</span> <span class="n">frameTiming</span><span class="p">[</span><span class="s1">&#39;Elapsed time (min)&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">frameTiming</span><span class="p">[</span><span class="s1">&#39;Duration of time frame (min)&#39;</span><span class="p">]</span>
+        <span class="n">frameEnd</span> <span class="o">=</span> <span class="n">frameTiming</span><span class="p">[</span><span class="s1">&#39;Elapsed time (min)&#39;</span><span class="p">]</span>
+        <span class="n">time_unit</span> <span class="o">=</span> <span class="s1">&#39;min&#39;</span>
+    <span class="k">elif</span> <span class="nb">all</span><span class="p">([</span><span class="n">col</span> <span class="ow">in</span> <span class="n">frameTiming</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Duration of time frame (s)&#39;</span><span class="p">,</span><span class="s1">&#39;Elapsed time (s)&#39;</span><span class="p">]]):</span>
+        <span class="n">frameStart</span> <span class="o">=</span> <span class="n">frameTiming</span><span class="p">[</span><span class="s1">&#39;Elapsed time (s)&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">frameTiming</span><span class="p">[</span><span class="s1">&#39;Duration of time frame (s)&#39;</span><span class="p">]</span>
+        <span class="n">frameEnd</span> <span class="o">=</span> <span class="n">frameTiming</span><span class="p">[</span><span class="s1">&#39;Elapsed time (s)&#39;</span><span class="p">]</span>
+        <span class="n">time_unit</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Frame timing spreadsheet &#39;</span> <span class="o">+</span> <span class="n">csvfilename</span> <span class="o">+</span> \
+                      <span class="s1">&#39; must contain two columns, with headers: Duration of time frame (min), Elapsed time (min) &#39;</span> <span class="o">+</span> \
+                      <span class="s1">&#39; OR Duration of time frame (s), Elapsed time (s)&#39;</span><span class="p">)</span>
+
+    <span class="n">frameStart</span> <span class="o">=</span> <span class="n">frameStart</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span> <span class="c1">#tolist()</span>
+    <span class="n">frameEnd</span> <span class="o">=</span> <span class="n">frameEnd</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span> <span class="c1">#tolist()</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">frameStart</span><span class="p">,</span> <span class="n">frameEnd</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_csvwrite_frameTiming</span><span class="p">(</span><span class="n">frameStart</span><span class="p">,</span> <span class="n">frameEnd</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">,</span> <span class="n">csvfilename</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Write frame timing information to csv file</span>
+<span class="sd">        There will be one column named &#39;Duration of time frame (min)&#39;</span>
+<span class="sd">        and another named &#39;Elapsed time (min)&#39;</span>
+
+<span class="sd">        Args</span>
+<span class="sd">        ----</span>
+<span class="sd">            frameStart : np.array</span>
+<span class="sd">                array of frame start times</span>
+<span class="sd">            frameEnd : np.array</span>
+<span class="sd">                array of frame end times</span>
+<span class="sd">            csvfilename : string</span>
+<span class="sd">                specification of output csv file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span>
+
+    <span class="n">timingData</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Duration of time frame (&#39;</span><span class="o">+</span><span class="n">time_unit</span><span class="o">+</span><span class="s1">&#39;)&#39;</span><span class="p">:</span> <span class="n">frameEnd</span> <span class="o">-</span> <span class="n">frameStart</span><span class="p">,</span>
+                                 <span class="s1">&#39;Elapsed time (&#39;</span><span class="o">+</span><span class="n">time_unit</span><span class="o">+</span><span class="s1">&#39;)&#39;</span><span class="p">:</span> <span class="n">frameEnd</span><span class="p">})</span>
+    <span class="n">timingData</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csvfilename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_sifread_frameTiming</span><span class="p">(</span><span class="n">siffilename</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Read frame timing information from sif file</span>
+
+<span class="sd">        Args</span>
+<span class="sd">        ----</span>
+<span class="sd">            siffilename : string</span>
+<span class="sd">                specification of sif file containing frame timing information</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">read_table</span>
+
+    <span class="n">frameTiming</span> <span class="o">=</span> <span class="n">read_table</span><span class="p">(</span><span class="n">siffilename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">frameStart</span> <span class="o">=</span> <span class="n">frameTiming</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+    <span class="n">frameEnd</span> <span class="o">=</span> <span class="n">frameTiming</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+    <span class="n">time_unit</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">frameStart</span><span class="p">,</span> <span class="n">frameEnd</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_sifwrite_frameTiming</span><span class="p">(</span><span class="n">frameStart</span><span class="p">,</span> <span class="n">frameEnd</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">,</span> <span class="n">siffilename</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Write frame timing information to sif file</span>
+
+<span class="sd">        Args</span>
+<span class="sd">        ----</span>
+<span class="sd">            frameStart : np.array</span>
+<span class="sd">                array of frame start times</span>
+<span class="sd">            frameEnd : np.array</span>
+<span class="sd">                array of frame end times</span>
+<span class="sd">            siffilename : string</span>
+<span class="sd">                specification of output sif file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span>
+
+    <span class="k">if</span> <span class="n">time_unit</span><span class="o">==</span><span class="s1">&#39;min&#39;</span><span class="p">:</span>
+        <span class="n">frameStart</span> <span class="o">*=</span> <span class="mi">60</span>
+        <span class="n">frameEnd</span> <span class="o">*=</span> <span class="mi">60</span>
+        <span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span>
+
+    <span class="k">if</span> <span class="n">time_unit</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">:</span>
+        <span class="c1"># we skip a row for sif header -- not tested</span>
+        <span class="n">timingData</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Start of time frame (s)&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">frameStart</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                                     <span class="s1">&#39;Elapsed time (s)&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">frameEnd</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+        <span class="n">timingData</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">siffilename</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span>
+                          <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Start of time frame (s)&#39;</span><span class="p">,</span><span class="s1">&#39;Elapsed time (s)&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Only min and s time units are supported&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">timingfilename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Load a temporal image</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    ----</span>
+<span class="sd">    filename : string</span>
+<span class="sd">        specification of 4D image file to load</span>
+<span class="sd">    timingfilename : string</span>
+<span class="sd">        specification of the csv file containing frame timing information</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">from</span> <span class="nn">nibabel</span> <span class="k">import</span> <span class="n">load</span> <span class="k">as</span> <span class="n">nibload</span>
+    <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;No such file: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">timingfilename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;No such file: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">timingfilename</span><span class="p">)</span>
+
+    <span class="n">img</span> <span class="o">=</span> <span class="n">nibload</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">timingfileext</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">timingfilename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">timingfileext</span><span class="o">==</span><span class="s1">&#39;.csv&#39;</span><span class="p">:</span>
+        <span class="n">frameStart</span><span class="p">,</span> <span class="n">frameEnd</span><span class="p">,</span> <span class="n">time_unit</span> <span class="o">=</span> <span class="n">_csvread_frameTiming</span><span class="p">(</span><span class="n">timingfilename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">timingfileext</span><span class="o">==</span><span class="s1">&#39;.sif&#39;</span><span class="p">:</span>
+        <span class="n">frameStart</span><span class="p">,</span> <span class="n">frameEnd</span><span class="p">,</span> <span class="n">time_unit</span> <span class="o">=</span> <span class="n">_sifread_frameTiming</span><span class="p">(</span><span class="n">timingfilename</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Timing files with extension &#39;</span> <span class="o">+</span> <span class="n">timingfileext</span> <span class="o">+</span> <span class="s1">&#39; are not supported&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">TemporalImage</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">dataobj</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span> <span class="n">frameStart</span><span class="p">,</span> <span class="n">frameEnd</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">,</span>
+                         <span class="n">header</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">extra</span><span class="p">,</span>
+                         <span class="n">file_map</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">file_map</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../temporalimage.html#temporalimage.t4d.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">timingfilename</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Save a temporal image</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    ----</span>
+<span class="sd">        img : TemporalImage</span>
+<span class="sd">            temporal 4D image to save</span>
+<span class="sd">        filename : string</span>
+<span class="sd">            specification of output image filename</span>
+<span class="sd">        timingfilename : string</span>
+<span class="sd">            specification of output csv filename for timing information</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">from</span> <span class="nn">nibabel</span> <span class="k">import</span> <span class="n">save</span> <span class="k">as</span> <span class="n">nibsave</span>
+    <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+    <span class="n">nibsave</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">timingfileext</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">timingfilename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">timingfileext</span><span class="o">==</span><span class="s1">&#39;.csv&#39;</span><span class="p">:</span>
+        <span class="n">_csvwrite_frameTiming</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">frameStart</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">time_unit</span><span class="p">,</span> <span class="n">timingfilename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">timingfileext</span><span class="o">==</span><span class="s1">&#39;.sif&#39;</span><span class="p">:</span>
+        <span class="n">_sifwrite_frameTiming</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">frameStart</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">frameEnd</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">time_unit</span><span class="p">,</span> <span class="n">timingfilename</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Timing files with extension &#39;</span> <span class="o">+</span> <span class="n">timingfileext</span> <span class="o">+</span> <span class="s1">&#39; are not supported&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">temporalimage 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+    </div>
+  </body>
+</html>
