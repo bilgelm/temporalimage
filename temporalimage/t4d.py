@@ -21,6 +21,7 @@ class TemporalImage(SpatialImage):
             # convert everything to min
             frameStart_min = frameStart / 60
             frameEnd_min = frameEnd / 60
+            time_unit = 'min'
         elif time_unit=='min':
             frameStart_min = frameStart
             frameEnd_min = frameEnd

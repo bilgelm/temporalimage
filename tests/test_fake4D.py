@@ -7,7 +7,6 @@ import numpy as np
 class TestTemporalImageFake4D(unittest.TestCase):
     def setUp(self):
         imgfile, timingfile, timingfile_s, timingfile_sif = generate_fake4D()
-        #self.timg = TemporalImage(imgfile, timingfile)
         self.timg = temporalimage.load(imgfile, timingfile)
         self.timg_s = temporalimage.load(imgfile, timingfile_s)
         self.timg_sif = temporalimage.load(imgfile, timingfile_sif)
@@ -178,10 +177,38 @@ class TestTemporalImageFake4D(unittest.TestCase):
 
         imgfilename = os.path.abspath(os.path.join(tmpdirname,'img.nii.gz'))
         csvfilename = os.path.abspath(os.path.join(tmpdirname,'timingData.csv'))
+        siffilename = os.path.abspath(os.path.join(tmpdirname,'timingData.sif'))
+
         temporalimage.save(self.timg, imgfilename, csvfilename)
 
         os.remove(imgfilename)
         os.remove(csvfilename)
+
+        temporalimage.save(self.timg, imgfilename, siffilename)
+
+        os.remove(imgfilename)
+        os.remove(siffilename)
+
+        temporalimage.save(self.timg_s, imgfilename, csvfilename)
+
+        os.remove(imgfilename)
+        os.remove(csvfilename)
+
+        temporalimage.save(self.timg_s, imgfilename, siffilename)
+
+        os.remove(imgfilename)
+        os.remove(siffilename)
+
+        temporalimage.save(self.timg_sif, imgfilename, csvfilename)
+
+        os.remove(imgfilename)
+        os.remove(csvfilename)
+
+        temporalimage.save(self.timg_sif, imgfilename, siffilename)
+
+        os.remove(imgfilename)
+        os.remove(siffilename)
+
         os.rmdir(tmpdirname)
     '''
     def test_sifwrite(self):
