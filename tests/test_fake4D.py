@@ -177,49 +177,36 @@ class TestTemporalImageFake4D(unittest.TestCase):
 
         imgfilename = os.path.abspath(os.path.join(tmpdirname,'img.nii.gz'))
         csvfilename = os.path.abspath(os.path.join(tmpdirname,'timingData.csv'))
-        siffilename = os.path.abspath(os.path.join(tmpdirname,'timingData.sif'))
+        sifname = os.path.abspath(os.path.join(tmpdirname,'timingData.sif'))
 
         temporalimage.save(self.timg, imgfilename, csvfilename)
 
         os.remove(imgfilename)
         os.remove(csvfilename)
 
-        temporalimage.save(self.timg, imgfilename, siffilename)
+        temporalimage.save(self.timg, imgfilename, sifname)
 
         os.remove(imgfilename)
-        os.remove(siffilename)
+        os.remove(sifname)
 
         temporalimage.save(self.timg_s, imgfilename, csvfilename)
 
         os.remove(imgfilename)
         os.remove(csvfilename)
 
-        temporalimage.save(self.timg_s, imgfilename, siffilename)
+        temporalimage.save(self.timg_s, imgfilename, sifname)
 
         os.remove(imgfilename)
-        os.remove(siffilename)
+        os.remove(sifname)
 
         temporalimage.save(self.timg_sif, imgfilename, csvfilename)
 
         os.remove(imgfilename)
         os.remove(csvfilename)
 
-        temporalimage.save(self.timg_sif, imgfilename, siffilename)
+        temporalimage.save(self.timg_sif, imgfilename, sifname)
 
         os.remove(imgfilename)
-        os.remove(siffilename)
+        os.remove(sifname)
 
         os.rmdir(tmpdirname)
-    '''
-    def test_sifwrite(self):
-        from tempfile import mkdtemp
-
-        # make a temporary directory in which to save the temporal image files
-        tmpdirname = mkdtemp()
-        siffilename = os.path.abspath(os.path.join(tmpdirname,'timingData.sif'))
-        temporalimage._sifwrite_frameTiming(self.timg.get_frameStart(),
-                                            self.timg.get_frameEnd(),
-                                            self.timg.time_unit, siffilename)
-        os.remove(siffilename)
-        os.rmdir(tmpdirname)
-    '''

@@ -2,8 +2,30 @@ from nibabel.analyze import SpatialImage
 import numpy as np
 
 class TemporalImage(SpatialImage):
+    '''
+    Method for initializing a TemporalImage object to store 4D image data with
+    corresponding time frame information
+
+    Args
+    ----
+        dataobj :
+        affine :
+        frameStart : 1-D np.array
+            Vector containing the times at which each time frame starts
+        frameEnd : 1-D np.array
+            Vector containing the times at which each time frame ends
+        time_unit : 's' or 'min'
+            Units of frameStart and frameEnd.
+            Can be seconds ('s') or minutes ('min')
+        header :
+        extra :
+        file_map :
+        sif_header : string
+            First row of Scan Information File (SIF)
+    '''
+
     def __init__(self, dataobj, affine, frameStart, frameEnd, time_unit=None,
-                 header=None, extra=None, file_map=None):
+                 header=None, extra=None, file_map=None, sif_header=None):
 
         super().__init__(dataobj, affine=affine, header=header,
                          extra=extra, file_map=file_map)
@@ -31,6 +53,7 @@ class TemporalImage(SpatialImage):
         self.frameStart = np.array(frameStart_min)
         self.frameEnd = np.array(frameEnd_min)
         self.time_unit = time_unit
+        self.sif_header = sif_header
 
     def get_numFrames(self):
         ''' Get number of time frames
@@ -278,26 +301,28 @@ def _csvwrite_frameTiming(frameStart, frameEnd, time_unit, csvfilename):
                                  'Elapsed time ('+time_unit+')': frameEnd})
     timingData.to_csv(csvfilename, index=False)
 
-def _sifread_frameTiming(siffilename):
-    ''' Read frame timing information from sif file
+def _sifread_frameTiming(sifname):
+    ''' Read frame timing information from Scan Information File (SIF)
 
         Args
         ----
-            siffilename : string
-                specification of sif file containing frame timing information
+            sifname : string
+                specification of sif containing frame timing information
     '''
     from pandas import read_table
 
-    frameTiming = read_table(siffilename, delim_whitespace=True, skiprows=1, header=None)
+    frameTiming = read_table(sifname, delim_whitespace=True, skiprows=1, header=None)
+    # TODO: read in first line
+    sif_header = None
 
     frameStart = frameTiming[0].as_matrix()
     frameEnd = frameTiming[1].as_matrix()
     time_unit = 's'
 
-    return (frameStart, frameEnd, time_unit)
+    return (frameStart, frameEnd, time_unit, sif_header)
 
-def _sifwrite_frameTiming(frameStart, frameEnd, time_unit, siffilename):
-    ''' Write frame timing information to sif file
+def _sifwrite_frameTiming(frameStart, frameEnd, time_unit, sifname, sif_header=None):
+    ''' Write frame timing information to Scan Information File (SIF)
 
         Args
         ----
@@ -305,8 +330,10 @@ def _sifwrite_frameTiming(frameStart, frameEnd, time_unit, siffilename):
                 array of frame start times
             frameEnd : np.array
                 array of frame end times
-            siffilename : string
-                specification of output sif file
+            sifname : string
+                specification of output sif
+            sif_header : string
+                first row of sif
     '''
 
     from pandas import DataFrame
@@ -320,7 +347,8 @@ def _sifwrite_frameTiming(frameStart, frameEnd, time_unit, siffilename):
         # we skip a row for sif header -- not tested
         timingData = DataFrame(data={'Start of time frame (s)': [' '] + frameStart.tolist(),
                                      'Elapsed time (s)': [' '] + frameEnd.tolist()})
-        timingData.to_csv(siffilename, header=None, index=None, sep=' ',
+        # TODO: write sif_header as first line
+        timingData.to_csv(sifname, header=None, index=None, sep=' ',
                           columns=['Start of time frame (s)','Elapsed time (s)'])
     else:
         raise ValueError('Only min and s time units are supported')
@@ -349,14 +377,15 @@ def load(filename, timingfilename, **kwargs):
     _, timingfileext = op.splitext(timingfilename)
     if timingfileext=='.csv':
         frameStart, frameEnd, time_unit = _csvread_frameTiming(timingfilename)
+        sif_header = None
     elif timingfileext=='.sif':
-        frameStart, frameEnd, time_unit = _sifread_frameTiming(timingfilename)
+        frameStart, frameEnd, time_unit, sif_header = _sifread_frameTiming(timingfilename)
     else:
         raise IOError('Timing files with extension ' + timingfileext + ' are not supported')
 
     return TemporalImage(img.dataobj, img.affine, frameStart, frameEnd, time_unit,
                          header=img.header, extra=img.extra,
-                         file_map=img.file_map)
+                         file_map=img.file_map, sif_header=sif_header)
 
 def save(img, filename, timingfilename):
     ''' Save a temporal image
@@ -379,6 +408,7 @@ def save(img, filename, timingfilename):
     if timingfileext=='.csv':
         _csvwrite_frameTiming(img.frameStart, img.frameEnd, img.time_unit, timingfilename)
     elif timingfileext=='.sif':
-        _sifwrite_frameTiming(img.frameStart, img.frameEnd, img.time_unit, timingfilename)
+        _sifwrite_frameTiming(img.frameStart, img.frameEnd, img.time_unit, timingfilename,
+                              sif_header=img.sif_header)
     else:
         raise IOError('Timing files with extension ' + timingfileext + ' are not supported')
