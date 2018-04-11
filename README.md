@@ -16,6 +16,6 @@ extra:
 
 ## To-do:
 - [x] Implement sif support: `_sifread_frameTiming` and `_sifwrite_frameTiming`
-- [ ] Additional tests to increase code coverage to 80%
+- [x] Additional tests to increase code coverage to 80%
 - [ ] :question: Incorporate unit handling with a package like `pint` :beer:, `units`, `numericalunits`, or `astropy.units`
 - [x] `nipype` integration
