@@ -2,3 +2,4 @@ nibabel
 pandas
 scipy
 numpy
+nipype[nipype]

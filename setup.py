@@ -17,4 +17,4 @@ setup(name='temporalimage',
       zip_safe=False,
       test_suite='nose.collector',
       tests_require=['nose'],
-      extras_require={'nipype': ['nibabel','nipype']})
+      extras_require={'nipype': ['nipype']})
