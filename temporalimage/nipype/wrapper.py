@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import nibabel as nib
-from nipype.interfaces.base import TraitedSpec, File, traits, BaseInterface, BaseInterfaceInputSpec
+from nipype.interfaces.base import TraitedSpec, File, traits, BaseInterface, BaseInterfaceInputSpec, isdefined
 from nipype.utils.filemanip import split_filename
 
 from ..t4d import load as ti_load
@@ -94,7 +94,11 @@ class DynamicMean(BaseInterface):
         frameTimingCsvFile = self.inputs.frameTimingCsvFile
         startTime = self.inputs.startTime
         endTime = self.inputs.endTime
-        weights = self.inputs.weights
+
+        if isdefined(self.inputs.weights):
+            weights = self.inputs.weights
+        else:
+            weights = None
 
         _, base, _ = split_filename(timeSeriesImgFile)
 

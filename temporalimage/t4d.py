@@ -216,6 +216,8 @@ class TemporalImage(SpatialImage):
         elif weights=='frameduration':
             delta = self.get_frameDuration()
             dyn_mean = np.average(self.get_data(), axis=3, weights=delta)
+        else:
+            raise ValueError('Weights should be None or frameduration')
 
         return dyn_mean
 
