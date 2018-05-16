@@ -6,7 +6,7 @@ try:
     import numpy as np
     from tempfile import mkdtemp
 
-    from temporalimage.nipype import SplitTimeSeries, DynamicMean
+    from temporalimage.nipype_wrapper import SplitTimeSeries, DynamicMean
     from nipype.pipeline.engine import Node
 
     class TestTemporalImageNipype(unittest.TestCase):
@@ -40,7 +40,12 @@ try:
                                                       name="dynamic_mean")
             dynamic_mean.run()
 
-            dynamic_mean.inputs.weights = 'frameduration'
+        def test_nipype_dynamic_mean(self):
+            dynamic_mean = Node(interface=DynamicMean(timeSeriesImgFile=self.imgfilename,
+                                                      frameTimingCsvFile=self.csvfilename,
+                                                      startTime=13, endTime=42,
+                                                      weights='frameduration'),
+                                                      name="dynamic_mean")
             dynamic_mean.run()
 
 except ImportError:
