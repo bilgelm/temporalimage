@@ -21,11 +21,13 @@ class TemporalImage(SpatialImage):
         extra :
         file_map :
         sif_header : string
+        json_dict : dict
             First row of Scan Information File (SIF)
     '''
 
     def __init__(self, dataobj, affine, frameStart, frameEnd, time_unit=None,
-                 header=None, extra=None, file_map=None, sif_header=None):
+                 header=None, extra=None, file_map=None,
+                 sif_header=None, json_dict=None):
 
         super().__init__(dataobj, affine=affine, header=header,
                          extra=extra, file_map=file_map)
@@ -54,6 +56,7 @@ class TemporalImage(SpatialImage):
         self.frameEnd = np.array(frameEnd_min)
         self.time_unit = time_unit
         self.sif_header = sif_header
+        self.json_dict = json_dict
 
     def get_numFrames(self):
         ''' Get number of time frames
@@ -355,6 +358,43 @@ def _sifwrite_frameTiming(frameStart, frameEnd, time_unit, sifname, sif_header=N
     else:
         raise ValueError('Only min and s time units are supported')
 
+def _jsonread_frameTiming(jsonfilename):
+    ''' Read frame timing information from PET-BIDS json sidecar
+
+        Args
+        ----
+            jsonfname : string
+                BIDS json sidecar file name
+    '''
+    import json
+    with open(jsonfilename, 'r') as f:
+        json_dict = json.load(f)
+
+    frameVals = np.array(json_dict['Time']['FrameTimes']['Values'])
+
+    frameStart = frameVals[:,0]
+    frameEnd = frameVals[:,1]
+
+    time_unit, time_unit2 = json_dict['Time']['FrameTimes']['Units']
+
+    if time_unit!=time_unit2:
+        # convert time_unit2 to time_unit
+        if time_unit=='s' and time_unit2=='min':
+            frameEnd *= 60
+        elif time_unit=='min' and time_unit2=='s':
+            frameEnd /= 60
+        else:
+            raise ValueError('Cannot convert between time units specified in the json file')
+
+    return (frameStart, frameEnd, time_unit, json_dict)
+
+def _jsonwrite_frameTiming(frameStart, frameEnd, time_unit, jsonfilename, json_dict):
+    json_dict['Time']['FrameTimes']['Units'] = [time_unit, time_unit]
+    json_dict['Time']['FrameTimes']['Values'] = np.vstack((frameStart, frameEnd)).T.tolist()
+
+    with open(jsonfilename, 'w') as f:
+        json.dump(json_dict, f)
+
 def load(filename, timingfilename, **kwargs):
     ''' Load a temporal image
 
@@ -380,14 +420,20 @@ def load(filename, timingfilename, **kwargs):
     if timingfileext=='.csv':
         frameStart, frameEnd, time_unit = _csvread_frameTiming(timingfilename)
         sif_header = None
+        json_dict = None
     elif timingfileext=='.sif':
         frameStart, frameEnd, time_unit, sif_header = _sifread_frameTiming(timingfilename)
+        json_dict = None
+    elif timingfileext=='.json':
+        frameStart, frameEnd, time_unit, json_dict = _jsonread_frameTiming(timingfilename)
+        sif_header = None
     else:
         raise IOError('Timing files with extension ' + timingfileext + ' are not supported')
 
     return TemporalImage(img.dataobj, img.affine, frameStart, frameEnd, time_unit,
                          header=img.header, extra=img.extra,
-                         file_map=img.file_map, sif_header=sif_header)
+                         file_map=img.file_map,
+                         sif_header=sif_header, json_dict=json_dict)
 
 def save(img, filename, timingfilename):
     ''' Save a temporal image
@@ -412,5 +458,8 @@ def save(img, filename, timingfilename):
     elif timingfileext=='.sif':
         _sifwrite_frameTiming(img.frameStart, img.frameEnd, img.time_unit, timingfilename,
                               sif_header=img.sif_header)
+    elif timingfileext=='.json':
+        _jsonwrite_frameTiming(img.frameStart, img.frameEnd, img.time_unit, timingfilename,
+                               json_dict=img.json_dict)
     else:
         raise IOError('Timing files with extension ' + timingfileext + ' are not supported')
