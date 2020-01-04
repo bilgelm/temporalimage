@@ -1,6 +1,6 @@
 try:
     import temporalimage
-    from generate_test_data import generate_fake4D
+    from .generate_test_data import generate_fake4D
     import os
     from shutil import rmtree
     from uuid import uuid4

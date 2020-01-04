@@ -13,9 +13,3 @@ Clone this repository to your machine, then type in terminal:
 If you'd like to have wrappers for integration with `nipype`, use the `nipype`
 extra:
 `pip install -e PATH_TO/temporalimage[nipype]`
-
-## To-do:
-- [x] Implement sif support: `_sifread_frameTiming` and `_sifwrite_frameTiming`
-- [x] Additional tests to increase code coverage to 80%
-- [ ] :question: Incorporate unit handling with a package like `pint` :beer:, `units`, `numericalunits`, or `astropy.units`
-- [x] `nipype` integration

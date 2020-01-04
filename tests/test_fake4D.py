@@ -1,6 +1,6 @@
 import temporalimage
 from temporalimage import Quantity
-from generate_test_data import generate_fake4D
+from .generate_test_data import generate_fake4D
 import os
 import unittest
 import numpy as np
