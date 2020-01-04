@@ -1,5 +1,6 @@
 import temporalimage
-from .generate_test_data import generate_fake4D
+from temporalimage import Quantity
+from generate_test_data import generate_fake4D
 import os
 import unittest
 import numpy as np
@@ -18,30 +19,31 @@ class TestTemporalImageFake4D(unittest.TestCase):
         self.assertEqual(self.timg.get_numFrames(), 7)
 
     def test_get_startTime(self):
-        self.assertEqual(0, self.timg.get_startTime())
+        self.assertEqual(Quantity(0,'minute'), self.timg.get_startTime())
 
     def test_get_endTime(self):
-        self.assertEqual(60, self.timg.get_endTime())
+        self.assertEqual(Quantity(60,'minute'), self.timg.get_endTime())
 
     def test_get_frameDuration(self):
-        self.assertTrue(np.allclose(np.array([5,5] + [10]*5),
-                                             self.timg.get_frameDuration()))
+        self.assertTrue(np.allclose(Quantity(np.array([5,5] + [10]*5),'minute'),
+                                    self.timg.get_frameDuration()))
 
     def test_get_frameStart(self):
-        self.assertTrue(np.allclose(np.array([0, 5, 10, 20, 30, 40, 50]),
+        self.assertTrue(np.allclose(Quantity(np.array([0, 5, 10, 20, 30, 40, 50]),'minute'),
                                     self.timg.get_frameStart()))
 
     def test_get_frameEnd(self):
-        self.assertTrue(np.allclose(np.array([5, 10, 20, 30, 40, 50, 60]),
+        self.assertTrue(np.allclose(Quantity(np.array([5, 10, 20, 30, 40, 50, 60]),'minute'),
                                     self.timg.get_frameEnd()))
 
     def test_get_midTime(self):
-        self.assertTrue(np.allclose(np.array([2.5, 7.5, 15, 25, 35, 45, 55]),
+        self.assertTrue(np.allclose(Quantity(np.array([2.5, 7.5, 15, 25, 35, 45, 55]),'minute'),
                                     self.timg.get_midTime()))
 
     def test_extractTime_silly(self):
         '''
-        Silly test where we call extractTime without actually changing the start or end times
+        Silly test where we call extractTime without actually changing the
+        start or end times
         '''
         startTime = self.timg.get_startTime()
         endTime = self.timg.get_endTime()
@@ -103,8 +105,8 @@ class TestTemporalImageFake4D(unittest.TestCase):
         frameStart = self.timg.get_frameStart()
         frameEnd = self.timg.get_frameEnd()
 
-        startTime = frameStart[1] + .1
-        endTime = frameEnd[-2] - .1
+        startTime = frameStart[1] + Quantity(.1,'minute')
+        endTime = frameEnd[-2] - Quantity(.1,'minute')
 
         extr = self.timg.extractTime(startTime, endTime)
         self.assertEqual(extr.shape[3], len(frameStart) - 4)
@@ -120,7 +122,7 @@ class TestTemporalImageFake4D(unittest.TestCase):
         self.assertEqual(firstImg.shape[3], 1)
         self.assertEqual(firstImg.get_startTime(), self.timg.get_startTime())
         self.assertEqual(firstImg.get_endTime(), splitTime)
-        self.assertEqual(secondImg.shape[3], self.timg.get_data().shape[3]-1)
+        self.assertEqual(secondImg.shape[3], self.timg.shape[3]-1)
         self.assertEqual(secondImg.get_startTime(), splitTime)
         self.assertEqual(secondImg.get_endTime(), self.timg.get_endTime())
 
@@ -151,11 +153,11 @@ class TestTemporalImageFake4D(unittest.TestCase):
         extr_mean = extr.dynamic_mean()
 
         self.assertSequenceEqual(extr_mean.shape,extr.shape[:3])
-        self.assertAlmostEqual(np.absolute(extr.get_data()[:,:,:,0]-extr_mean).max(),0)
+        self.assertAlmostEqual(np.absolute(extr.get_fdata()[:,:,:,0]-extr_mean).max(),0)
 
         extr_mean_weighted = extr.dynamic_mean(weights='frameduration')
-        self.assertSequenceEqual(extr_mean_weighted.shape,extr.shape[:3])
-        self.assertAlmostEqual(np.absolute(extr.get_data()[:,:,:,0]-extr_mean_weighted).max(),0)
+        self.assertSequenceEqual(extr_mean_weighted.shape, extr.shape[:3])
+        self.assertAlmostEqual(np.absolute(extr.get_fdata()[:,:,:,0]-extr_mean_weighted).max(),0)
 
     def test_dynamic_mean(self):
         self.timg.dynamic_mean()
@@ -167,7 +169,7 @@ class TestTemporalImageFake4D(unittest.TestCase):
     def test_roi_timeseries_silly(self):
         mask = np.ones(self.timg.shape[:-1])
         self.assertTrue(np.allclose(self.timg.roi_timeseries(mask=mask),
-                                    np.mean(self.timg.get_data(), axis=(0,1,2))))
+                                    np.mean(self.timg.get_fdata(), axis=(0,1,2))))
 
     def test_save(self):
         from tempfile import mkdtemp
