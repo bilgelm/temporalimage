@@ -1,6 +1,6 @@
 from nibabel.analyze import SpatialImage
 import numpy as np
-from . import unitreg, Quantity, UnitStrippedWarning # via pint
+from . import unitreg, Quantity # via pint
 
 class TemporalImage(SpatialImage):
     '''
