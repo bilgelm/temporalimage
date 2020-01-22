@@ -167,7 +167,7 @@ class TemporalImage(SpatialImage):
 
         return extractedImg
 
-    @unitreg.check((None, '[time]'))
+    #@unitreg.check((None, '[time]'))
     def splitTime(self, splitTime):
         '''
         Split the 4D temporal image into two 4D temporal images
