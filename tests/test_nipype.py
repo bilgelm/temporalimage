@@ -7,7 +7,8 @@ try:
     import unittest
     import numpy as np
 
-    from temporalimage.nipype_wrapper import SplitTimeSeries, DynamicMean
+    from temporalimage.nipype_wrapper import SplitTimeSeries, ExtractTimeSeries, \
+                                             DynamicMean
     from nipype.pipeline.engine import Node, Workflow
     from nipype.interfaces.utility import IdentityInterface
 
@@ -40,7 +41,7 @@ try:
             infosource.iterables = ('in_file', [self.imgfilename])
 
             # Split the dynamic scan
-            split_time = Node(SplitTimeSeries(frameTimingCsvFile=self.csvfilename,
+            split_time = Node(SplitTimeSeries(frameTimingFile=self.csvfilename,
                                               splitTime=10), name="split_time")
 
             split_time_workflow = Workflow(name="split_time_workflow",
@@ -50,11 +51,25 @@ try:
             ])
             split_time_workflow.run()
 
+        def test_nipype_extract(self):
+            infosource = Node(IdentityInterface(fields=['in_file']), name="infosource")
+            infosource.iterables = ('in_file', [self.imgfilename])
+
+            extract_time = Node(ExtractTimeSeries(frameTimingFile=self.csvfilename,
+                                                  startTime=13, endTime=42),
+                                name="extract_time")
+            extract_time_workflow = Workflow(name="extract_time_workflow",
+                                             base_dir=self.tmpdirname)
+            extract_time_workflow.connect([
+                (infosource, extract_time, [('in_file','timeSeriesImgFile')])
+            ])
+            extract_time_workflow.run()
+
         def test_nipype_dynamic_mean(self):
             infosource = Node(IdentityInterface(fields=['in_file']), name="infosource")
             infosource.iterables = ('in_file', [self.imgfilename])
 
-            dynamic_mean = Node(interface=DynamicMean(frameTimingCsvFile=self.csvfilename,
+            dynamic_mean = Node(interface=DynamicMean(frameTimingFile=self.csvfilename,
                                                       startTime=13, endTime=42),
                                                       name="dynamic_mean")
 
@@ -69,7 +84,7 @@ try:
             infosource = Node(IdentityInterface(fields=['in_file']), name="infosource")
             infosource.iterables = ('in_file', [self.imgfilename])
 
-            dynamic_mean = Node(DynamicMean(frameTimingCsvFile=self.csvfilename,
+            dynamic_mean = Node(DynamicMean(frameTimingFile=self.csvfilename,
                                             startTime=13, endTime=42,
                                             weights='frameduration'),
                                             name="dynamic_mean")

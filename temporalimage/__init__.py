@@ -1,5 +1,5 @@
 # import main class
-from pint import UnitRegistry
+from pint import UnitRegistry, UnitStrippedWarning
 unitreg = UnitRegistry()
 Quantity = unitreg.Quantity
 

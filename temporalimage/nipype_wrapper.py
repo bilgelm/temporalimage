@@ -9,12 +9,81 @@ from .t4d import load as ti_load
 from .t4d import save as ti_save
 from . import unitreg, Quantity
 
+class ExtractTimeSeriesInputSpec(BaseInterfaceInputSpec):
+    timeSeriesImgFile = File(exists=True, mandatory=True,
+                             desc='4D image file to be split')
+    frameTimingFile = File(exists=True, mandatory=True,
+                           desc=('csv, sif, or json file listing the duration '
+                                 'of each time frame in the 4D image'))
+    startTime = traits.Float(mandatory=True,
+                             desc=('minute into the time series image at which '
+                                   'to begin, inclusive'))
+    endTime = traits.Float(mandatory=True,
+                           desc=('minute into the time series image at which '
+                                 'to stop, exclusive'))
+
+class ExtractTimeSeriesOutputSpec(TraitedSpec):
+    imgFile = File(exists=True,desc=('first of the two split images '
+                                          '(up to but not including splitTime)'))
+    timingFile = File(exists=True,
+                      desc=('csv file listing the duration of each time '
+                            'frame in the first of the two split images'))
+    startTime = traits.Float(desc='possibly modified start time')
+    endTime = traits.Float(desc='possibly modified end time')
+
+class ExtractTimeSeries(BaseInterface):
+    '''
+    Extract a smaller 4D (time series/dynamic) image from a 4D image
+    '''
+
+    input_spec = ExtractTimeSeriesInputSpec
+    output_spec = ExtractTimeSeriesOutputSpec
+
+    def _run_interface(self, runtime):
+        timeSeriesImgFile = self.inputs.timeSeriesImgFile
+        frameTimingFile = self.inputs.frameTimingFile
+        startTime = Quantity(self.inputs.startTime, 'minute')
+        endTime = Quantity(self.inputs.endTime, 'minute')
+
+        _, base, _ = split_filename(timeSeriesImgFile)
+
+        ti = ti_load(timeSeriesImgFile, frameTimingFile)
+        img = ti.extractTime(startTime, endTime)
+
+        self.modStartTime = img.get_startTime().to('minute').magnitude
+        self.modEndTime = img.get_endTime().to('minute').magnitude
+
+        imgFile = base+'_'+'{:02.2f}'.format(self.modStartTime)+'to'+ \
+                                '{:02.2f}'.format(self.modEndTime)+'min.nii.gz'
+        timingFile = base+'_'+'{:02.2f}'.format(self.modStartTime)+'to'+ \
+                                   '{:02.2f}'.format(self.modEndTime)+'.csv'
+        ti_save(img, imgFile, timingFile)
+
+        return runtime
+
+    def _list_outputs(self):
+        outputs = self._outputs().get()
+        fname = self.inputs.timeSeriesImgFile
+        _, base, _ = split_filename(fname)
+
+        outputs['startTime'] = self.modStartTime
+        outputs['endTime'] = self.modEndTime
+        outputs['imgFile'] = os.path.abspath(base+'_'+ \
+                               '{:02.2f}'.format(self.modStartTime)+'to'+ \
+                               '{:02.2f}'.format(self.modEndTime)+'min.nii.gz')
+
+        outputs['timingFile'] = os.path.abspath(base+'_'+ \
+                                    '{:02.2f}'.format(self.modStartTime)+'to'+ \
+                                    '{:02.2f}'.format(self.modEndTime)+'.csv')
+        return outputs
+
+
 class SplitTimeSeriesInputSpec(BaseInterfaceInputSpec):
     timeSeriesImgFile = File(exists=True, mandatory=True,
                              desc='4D image file to be split')
-    frameTimingCsvFile = File(exists=True, mandatory=True,
-                              desc='csv file listing the duration of each '
-                                   'time frame in the 4D image, in minutes')
+    frameTimingFile = File(exists=True, mandatory=True,
+                           desc=('csv, sif, or json file listing the duration '
+                                 'of each time frame in the 4D image'))
     splitTime = traits.Float(mandatory=True,
                              desc=('minute into the time series image at which '
                                    'to split the 4D image'))
@@ -33,21 +102,20 @@ class SplitTimeSeriesOutputSpec(TraitedSpec):
                                   'frame in the second of the two split images'))
 
 class SplitTimeSeries(BaseInterface):
-    """
+    '''
     Split a 4D (time series/dynamic) image into two 4D images
-
-    """
+    '''
 
     input_spec = SplitTimeSeriesInputSpec
     output_spec = SplitTimeSeriesOutputSpec
 
     def _run_interface(self, runtime):
         timeSeriesImgFile = self.inputs.timeSeriesImgFile
-        frameTimingCsvFile = self.inputs.frameTimingCsvFile
+        frameTimingFile = self.inputs.frameTimingFile
         splitTime = Quantity(self.inputs.splitTime, 'minute')
         _, base, _ = split_filename(timeSeriesImgFile)
 
-        ti = ti_load(timeSeriesImgFile, frameTimingCsvFile)
+        ti = ti_load(timeSeriesImgFile, frameTimingFile)
         firstImg, secondImg = ti.splitTime(splitTime)
 
         self.firstImgStart = firstImg.get_startTime().to('minute').magnitude
@@ -96,9 +164,9 @@ class SplitTimeSeries(BaseInterface):
 class DynamicMeanInputSpec(BaseInterfaceInputSpec):
     timeSeriesImgFile = File(exists=True, mandatory=True,
                              desc='4D image file to average temporally')
-    frameTimingCsvFile = File(exists=True, mandatory=True,
-                              desc=('csv file listing the duration of each time '
-                                    'frame in the 4D image, in minutes'))
+    frameTimingFile = File(exists=True, mandatory=True,
+                           desc=('csv, sif, or json file listing the duration '
+                                 'of each time frame in the 4D image'))
     startTime = traits.Float(mandatory=True,
                              desc=('minute into the time series image at which '
                                    'to begin computing the mean image, inclusive'))
@@ -116,17 +184,16 @@ class DynamicMeanOutputSpec(TraitedSpec):
     endTime = traits.Float(desc='possibly modified end time')
 
 class DynamicMean(BaseInterface):
-    """
+    '''
     Compute the 3D mean of a 4D (time series/dynamic) image
-
-    """
+    '''
 
     input_spec = DynamicMeanInputSpec
     output_spec = DynamicMeanOutputSpec
 
     def _run_interface(self, runtime):
         timeSeriesImgFile = self.inputs.timeSeriesImgFile
-        frameTimingCsvFile = self.inputs.frameTimingCsvFile
+        frameTimingFile = self.inputs.frameTimingFile
         startTime = Quantity(self.inputs.startTime, 'minute')
         endTime = Quantity(self.inputs.endTime, 'minute')
 
@@ -137,7 +204,7 @@ class DynamicMean(BaseInterface):
 
         _, base, _ = split_filename(timeSeriesImgFile)
 
-        ti = ti_load(timeSeriesImgFile, frameTimingCsvFile)
+        ti = ti_load(timeSeriesImgFile, frameTimingFile)
         extractImg = ti.extractTime(startTime, endTime)
         self.modStartTime = extractImg.get_startTime().to('minute').magnitude
         self.modEndTime = extractImg.get_endTime().to('minute').magnitude
