@@ -237,7 +237,7 @@ class TemporalImage(SpatialImage):
         if weights is None:
             dyn_mean = np.average(self.get_fdata(), axis=3)
         elif weights=='frameduration':
-            delta = self.get_frameDuration()
+            delta = self.get_frameDuration().magnitude
             dyn_mean = np.average(self.get_fdata(), axis=3, weights=delta)
         else:
             raise ValueError('Weights should be None or frameduration')
