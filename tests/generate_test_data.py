@@ -51,9 +51,9 @@ def generate_fake4D():
         for j in range(dims[1]):
             for k in range(dims[2]):
                 if k<(dims[2]//2):
-                    img_dat[i,j,k,:] = Cref.magnitude
+                    img_dat[i,j,k,:] = Cref
                 else:
-                    img_dat[i,j,k,:] = Ct.magnitude
+                    img_dat[i,j,k,:] = Ct
 
 
 
