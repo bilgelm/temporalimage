@@ -40,14 +40,12 @@ def generate_fake4D():
 
     R1 = 1.0
     DVR = 1.2
-    k2 = Quantity(1.1,'1/minute')
+    k2 = 1.1 # 1/minute
 
-    Cref = Quantity(np.array([0, 100, 200, 160, 140, 120, 120],
-                             dtype=np.float64), 'Bq')
-    t = 0.5*(frameStart + frameEnd)
+    Cref = np.array([0, 100, 200, 160, 140, 120, 120], dtype=np.float64)
+    t = 0.5*(frameStart + frameEnd).magnitude
     Ct = R1 * Cref + \
-        Quantity(np.convolve((k2 - R1*k2/DVR) * Cref, np.exp(-k2*t / DVR),
-                             'same'), 'Bq')
+         np.convolve((k2 - R1*k2/DVR) * Cref, np.exp(-k2*t / DVR), 'same')
 
     for i in range(dims[0]):
         for j in range(dims[1]):
