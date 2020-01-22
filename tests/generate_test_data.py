@@ -11,10 +11,8 @@ def generate_fake4D():
     dims = (10,11,12,7)
     img_dat = np.zeros(dims)
 
-    frameStart = Quantity(np.array([0, 5, 10, 20, 30, 40, 50]), 'minute')
-    frameEnd = Quantity(np.append(frameStart[1:],
-                                  frameStart[-1] + Quantity(10,'minute')),
-                        'minute')
+    frameStart = Quantity(np.array([0,  5, 10, 20, 30, 40, 50]), 'minute')
+    frameEnd = Quantity(  np.array([5, 10, 20, 30, 40, 50, 60]), 'minute')
     frameDuration = frameEnd - frameStart
     timingData_min = pd.DataFrame(data={
                         'Duration of time frame (min)': frameDuration.magnitude,
