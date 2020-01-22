@@ -97,7 +97,7 @@ class TemporalImage(SpatialImage):
         t = (self.frameStart + self.frameEnd)/2
         return t
 
-    @unitreg.check((None, '[time]', '[time]'))
+    #@unitreg.check((None, '[time]', '[time]'))
     def extractTime(self, startTime, endTime):
         '''
         Extract a 4D temporal image from a longer-duration 4D temporal image
