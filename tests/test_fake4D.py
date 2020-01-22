@@ -25,20 +25,20 @@ class TestTemporalImageFake4D(unittest.TestCase):
         self.assertEqual(Quantity(60,'minute'), self.timg.get_endTime())
 
     def test_get_frameDuration(self):
-        self.assertTrue(np.allclose(Quantity(np.array([5,5] + [10]*5),'minute'),
-                                    self.timg.get_frameDuration()))
+        self.assertTrue(np.allclose(np.array([5,5] + [10]*5),
+                                    self.timg.get_frameDuration().to('min').magnitude))
 
     def test_get_frameStart(self):
-        self.assertTrue(np.allclose(Quantity(np.array([0, 5, 10, 20, 30, 40, 50]),'minute'),
-                                    self.timg.get_frameStart()))
+        self.assertTrue(np.allclose(np.array([0, 5, 10, 20, 30, 40, 50]),
+                                    self.timg.get_frameStart().to('min').magnitude))
 
     def test_get_frameEnd(self):
-        self.assertTrue(np.allclose(Quantity(np.array([5, 10, 20, 30, 40, 50, 60]),'minute'),
-                                    self.timg.get_frameEnd()))
+        self.assertTrue(np.allclose(np.array([5, 10, 20, 30, 40, 50, 60]),
+                                    self.timg.get_frameEnd().to('min').magnitude))
 
     def test_get_midTime(self):
-        self.assertTrue(np.allclose(Quantity(np.array([2.5, 7.5, 15, 25, 35, 45, 55]),'minute'),
-                                    self.timg.get_midTime()))
+        self.assertTrue(np.allclose(np.array([2.5, 7.5, 15, 25, 35, 45, 55]),
+                                    self.timg.get_midTime().to('min').magnitude))
 
     def test_extractTime_silly(self):
         '''
