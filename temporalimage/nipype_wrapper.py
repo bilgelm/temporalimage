@@ -230,3 +230,111 @@ class DynamicMean(BaseInterface):
                             '{:02.2f}'.format(self.modEndTime)+'min_mean.nii.gz')
 
         return outputs
+
+
+class ROI_TACs_to_spreadsheetInputSpec(BaseInterfaceInputSpec):
+    timeSeriesImgFile = File(exists=True, desc='4D PET image', mandatory=True)
+    frameTimingFile = File(exists=True, mandatory=True,
+                              desc=('csv/sif/json file listing the duration of '
+                                    'each time frame in the 4D image'))
+
+    labelImgFile = File(exists=True, desc='Label image', mandatory=True)
+
+    ROI_list = traits.List(traits.Int(), minlen=1,
+                           desc=("list of ROI indices for which stats will be "
+                                 "computed (should match the label indices in "
+                                 "the label image)"),
+                           mandatory=True)
+    ROI_names = traits.List(traits.String(), minlen=1,
+                            desc=("list of equal size to ROI_list that lists "
+                                  "the corresponding ROI names"),
+                            mandatory=True)
+    additionalROIs = traits.List(traits.List(traits.Int()),
+                                 desc='list of lists of integers')
+    additionalROI_names = traits.List(traits.String(),
+                                      desc='names corresponding to additional ROIs')
+
+class ROI_TACs_to_spreadsheetOutputSpec(TraitedSpec):
+    csvFile = File(exists=True, desc='csv file')
+
+class ROI_TACs_to_spreadsheet(BaseInterface):
+    '''
+    Compute TAC per ROI and write to spreadsheet,
+    with rows corresponding to ROIs and columns to time frames.
+    First column is populated with ROI names (from ROI_names and
+    additionalROI_names), and first row is a 0-indexed counter of time frame no.
+    '''
+
+    input_spec = ROI_TACs_to_spreadsheetInputSpec
+    output_spec = ROI_TACs_to_spreadsheetOutputSpec
+
+    def _run_interface(self, runtime):
+        import csv
+
+        timeSeriesImgFile = self.inputs.timeSeriesImgFile
+        labelImgFile = self.inputs.labelImgFile
+        ROI_list = self.inputs.ROI_list
+        ROI_names = self.inputs.ROI_names
+        additionalROIs = self.inputs.additionalROIs
+        additionalROI_names = self.inputs.additionalROI_names
+
+        _, base, _ = split_filename(timeSeriesImgFile)
+        csvfile = os.path.abspath(base+'_ROI_TACs.csv')
+
+        assert(len(ROI_list)==len(ROI_names))
+        assert(len(additionalROIs)==len(additionalROI_names))
+
+        image = ti_load(timeSeriesImgFile, self.inputs.frameTimingFile)
+
+        labelimage = nib.load(labelImgFile)
+        labelimage_dat = labelimage.get_data()
+
+        # csv file
+        wf = open(csvfile, mode='w')
+        writer = csv.writer(wf, delimiter=',',
+                            quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+        row_content = ['ROI'] + list(range(image.get_numFrames()))
+        writer.writerow(row_content)
+
+        for i, ROI in enumerate(ROI_list):
+            ROI_mask = labelimage_dat==ROI
+
+            row_content = [ROI_names[i]]
+            if ROI_mask.sum()>0:
+                ROI_stat = image.roi_timeseries(mask=ROI_mask).tolist()
+                #ROI_stat = image_dat[ROI_mask,:].mean(axis=-1)
+            else:
+                ROI_stat = [''] * image.get_numFrames()
+            row_content.extend(ROI_stat)
+
+            writer.writerow(row_content)
+
+        if isdefined(additionalROIs):
+            for i, compositeROI in enumerate(additionalROIs):
+                ROI_mask = labelimage_dat==compositeROI[0]
+
+                row_content = [additionalROI_names[i]]
+                if len(compositeROI)>1:
+                    for compositeROImember in compositeROI[1:]:
+                        ROI_mask = ROI_mask | (labelimage_dat==compositeROImember)
+                if ROI_mask.sum()>0:
+                    ROI_stat = image.roi_timeseries(mask=ROI_mask).tolist()
+                else:
+                    ROI_stat = [''] * image.get_numFrames()
+                row_content.extend(ROI_stat)
+
+                writer.writerow(row_content)
+
+        wf.close()
+
+        return runtime
+
+    def _list_outputs(self):
+        outputs = self._outputs().get()
+
+        _, base, _ = split_filename(self.inputs.timeSeriesImgFile)
+
+        outputs['csvFile'] = os.path.abspath(base+'_ROI_TACs.csv')
+
+        return outputs

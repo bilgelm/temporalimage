@@ -7,8 +7,9 @@ try:
     import unittest
     import numpy as np
 
+    import nibabel as nib
     from temporalimage.nipype_wrapper import SplitTimeSeries, ExtractTimeSeries, \
-                                             DynamicMean
+                                             DynamicMean, ROI_TACs_to_spreadsheet
     from nipype.pipeline.engine import Node, Workflow
     from nipype.interfaces.utility import IdentityInterface
 
@@ -30,6 +31,16 @@ try:
                                                             'timingData.csv'))
 
             temporalimage.save(timg, self.imgfilename, self.csvfilename)
+
+            labelimgdata = np.zeros(timg.shape[:-1])
+            print(labelimgdata.shape)
+            labelimgdata[...,int(labelimgdata.shape[2]/3):] = 1
+            labelimgdata[...,int(labelimgdata.shape[2]*2/3):] = 2
+
+            self.labelfilename = os.path.abspath(os.path.join(self.tmpdirname,
+                                                              'label.nii.gz'))
+            nib.save(nib.Nifti1Image(labelimgdata, timg.affine),
+                     self.labelfilename)
 
         def tearDown(self):
             # remove the tests_output directory
@@ -69,9 +80,9 @@ try:
             infosource = Node(IdentityInterface(fields=['in_file']), name="infosource")
             infosource.iterables = ('in_file', [self.imgfilename])
 
-            dynamic_mean = Node(interface=DynamicMean(frameTimingFile=self.csvfilename,
-                                                      startTime=13, endTime=42),
-                                                      name="dynamic_mean")
+            dynamic_mean = Node(DynamicMean(frameTimingFile=self.csvfilename,
+                                            startTime=13, endTime=42),
+                                name="dynamic_mean")
 
             dynamic_mean_workflow = Workflow(name="dynamic_mean_workflow",
                                              base_dir=self.tmpdirname)
@@ -87,7 +98,7 @@ try:
             dynamic_mean = Node(DynamicMean(frameTimingFile=self.csvfilename,
                                             startTime=13, endTime=42,
                                             weights='frameduration'),
-                                            name="dynamic_mean")
+                                name="dynamic_mean")
 
             dynamic_mean_workflow = Workflow(name="dynamic_mean_workflow",
                                              base_dir=self.tmpdirname)
@@ -95,6 +106,25 @@ try:
                 (infosource, dynamic_mean, [('in_file', 'timeSeriesImgFile')])
             ])
             dynamic_mean_workflow.run()
+
+        def test_roi_tacs(self):
+            infosource = Node(IdentityInterface(fields=['in_file']), name="infosource")
+            infosource.iterables = ('in_file', [self.imgfilename])
+
+            roi_tacs = Node(ROI_TACs_to_spreadsheet(frameTimingFile=self.csvfilename,
+                                                    labelImgFile = self.labelfilename,
+                                                    ROI_list = [0,1,2],
+                                                    ROI_names = ['a','b','c'],
+                                                    additionalROIs = [[0,1],[1,2]],
+                                                    additionalROI_names=['ab','bc']),
+                            name="roi_tacs")
+
+            roi_tacs_workflow = Workflow(name="roi_tacs_workflow",
+                                         base_dir=self.tmpdirname)
+            roi_tacs_workflow.connect([
+                (infosource, roi_tacs, [('in_file','timeSeriesImgFile')])
+            ])
+            roi_tacs_workflow.run()
 
 except ImportError:
     print('Cannot perform temporalimage.nipype tests. \
