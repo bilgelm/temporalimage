@@ -33,7 +33,6 @@ try:
             temporalimage.save(timg, self.imgfilename, self.csvfilename)
 
             labelimgdata = np.zeros(timg.shape[:-1])
-            print(labelimgdata.shape)
             labelimgdata[...,int(labelimgdata.shape[2]/3):] = 1
             labelimgdata[...,int(labelimgdata.shape[2]*2/3):] = 2
 

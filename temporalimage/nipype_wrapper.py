@@ -303,12 +303,8 @@ class ROI_TACs_to_spreadsheet(BaseInterface):
             row_content = [ROI_names[i]]
             if ROI_mask.sum()>0:
                 ROI_stat = image.roi_timeseries(mask=ROI_mask).tolist()
-                #ROI_stat = image_dat[ROI_mask,:].mean(axis=-1)
-            else:
-                ROI_stat = [''] * image.get_numFrames()
-            row_content.extend(ROI_stat)
-
-            writer.writerow(row_content)
+                row_content.extend(ROI_stat)
+                writer.writerow(row_content)
 
         if isdefined(additionalROIs):
             for i, compositeROI in enumerate(additionalROIs):
@@ -320,11 +316,8 @@ class ROI_TACs_to_spreadsheet(BaseInterface):
                         ROI_mask = ROI_mask | (labelimage_dat==compositeROImember)
                 if ROI_mask.sum()>0:
                     ROI_stat = image.roi_timeseries(mask=ROI_mask).tolist()
-                else:
-                    ROI_stat = [''] * image.get_numFrames()
-                row_content.extend(ROI_stat)
-
-                writer.writerow(row_content)
+                    row_content.extend(ROI_stat)
+                    writer.writerow(row_content)
 
         wf.close()
 
