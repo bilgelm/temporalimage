@@ -401,20 +401,39 @@ def _jsonread_frameTiming(jsonfilename):
     with open(jsonfilename, 'r') as f:
         json_dict = json_load(f)
 
-    frameVals = np.array(json_dict['Time']['FrameTimes']['Values'])
-
-    col_frameStart = json_dict['Time']['FrameTimes']['Labels'].index('frameStart')
-    time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameStart]
-    frameStart = Quantity(frameVals[:,col_frameStart], time_unit)
-
     try:
-        col_frameEnd = json_dict['Time']['FrameTimes']['Labels'].index('frameEnd')
-        time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameEnd]
-        frameEnd = Quantity(frameVals[:,col_frameEnd], time_unit)
+        # accommodate the older format
+        frameVals = np.array(json_dict['Time']['FrameTimes']['Values'])
+
+        col_frameStart = json_dict['Time']['FrameTimes']['Labels'].index('frameStart')
+        time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameStart]
+        frameStart = Quantity(frameVals[:,col_frameStart], time_unit)
+
+        try:
+            col_frameEnd = json_dict['Time']['FrameTimes']['Labels'].index('frameEnd')
+            time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameEnd]
+            frameEnd = Quantity(frameVals[:,col_frameEnd], time_unit)
+        except:
+            col_frameDuration = json_dict['Time']['FrameTimes']['Labels'].index('frameDuration')
+            time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameDuration]
+            frameDuration = Quantity(frameVals[:,col_frameDuration], time_unit)
+            frameEnd = frameStart + frameDuration
     except:
-        col_frameDuration = json_dict['Time']['FrameTimes']['Labels'].index('frameDuration')
-        time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameDuration]
-        frameDuration = Quantity(frameVals[:,col_frameDuration], time_unit)
+        try:
+            # accommodate the intermediate PET BIDS version that allowed for
+            # different units
+            time_unit = json_dict['Time']['FrameTimesStartUnits']
+        except:
+            time_unit = 's'
+        frameStart = Quantity(np.array(json_dict['Time']['FrameTimesStart']),
+                              time_unit)
+        try:
+            time_unit = json_dict['Time']['FrameDurationUnits']
+        except:
+            time_unit = 's'
+        frameDuration = Quantity(np.array(json_dict['Time']['FrameDuration']),
+                                 time_unit)
+
         frameEnd = frameStart + frameDuration
 
     return frameStart, frameEnd, json_dict
@@ -433,13 +452,20 @@ def _jsonwrite_frameTiming(frameStart, frameEnd,
         json_dict (dict): json dictionary
         time_unit (str): units of time to be used in the output json
     '''
-    json_dict['Time'] = { 'FrameTimes': {
-                            'Labels': ['frameStart', 'frameEnd'],
-                            'Units': [time_unit, time_unit],
-                            'Values': np.vstack((
-                                      frameStart.to(time_unit).magnitude,
-                                      frameEnd.to(time_unit).magnitude)).T.tolist()
-                           } }
+    #json_dict['Time'] = { 'FrameTimes': {
+    #                        'Labels': ['frameStart', 'frameEnd'],
+    #                        'Units': [time_unit, time_unit],
+    #                        'Values': np.vstack((
+    #                                  frameStart.to(time_unit).magnitude,
+    #                                  frameEnd.to(time_unit).magnitude)).T.tolist()
+    #                       } }
+
+    json_dict['Time'] = {
+        'FrameTimesStart': frameStart.to(time_unit).magnitude,
+        'FrameTimesStartUnits': time_unit,
+        'FrameDuration': (frameEnd - frameStart).to(time_unit).magnitude,
+        'FrameDurationUnits': time_unit
+    }
 
     with open(jsonfilename, 'w') as f:
         json.dump(json_dict, f)
