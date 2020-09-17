@@ -351,8 +351,7 @@ def _sifread_frameTiming(sifname):
     '''
     from pandas import read_table
 
-    frameTiming = read_table(sifname, delim_whitespace=True, sep=None,
-                             skiprows=1, header=None).values
+    frameTiming = read_table(sifname, sep='\s+', skiprows=1, header=None).values
 
     # read in first line
     with open(sifname, 'r') as f:
