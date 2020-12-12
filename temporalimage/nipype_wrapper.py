@@ -287,7 +287,7 @@ class ROI_TACs_to_spreadsheet(BaseInterface):
         image = ti_load(timeSeriesImgFile, self.inputs.frameTimingFile)
 
         labelimage = nib.load(labelImgFile)
-        labelimage_dat = labelimage.get_data()
+        labelimage_dat = labelimage.get_fdata()
 
         # csv file
         wf = open(csvfile, mode='w')

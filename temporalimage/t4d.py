@@ -171,6 +171,7 @@ class TemporalImage(SpatialImage):
     def splitTime(self, splitTime):
         '''
         Split the 4D temporal image into two 4D temporal images
+        Total number of frames will be preserved
 
         Args:
             splitTime (temporalimage.Quantity): time at which to split the 4D image
@@ -182,7 +183,17 @@ class TemporalImage(SpatialImage):
                                                      images (includes splitTime)
         '''
         firstImg = self.extractTime(self.frameStart[0],splitTime)
-        secondImg = self.extractTime(splitTime, self.frameEnd[-1])
+        #secondImg = self.extractTime(splitTime, self.frameEnd[-1])
+        if firstImg.shape[-1]==self.shape[-1]:
+            raise ValueError(('Start time for the second of the split images '
+                              'is beyond the time covered by the time series data!'))
+
+        sliceObj = slice(firstImg.shape[-1], self.shape[-1])
+        secondImg = TemporalImage(self.get_fdata()[:,:,:,sliceObj],
+                                  self.affine,
+                                  self.frameStart[sliceObj],
+                                  self.frameEnd[sliceObj],
+                                  self.header, self.extra, self.file_map)
         return firstImg, secondImg
 
     def roi_timeseries(self, maskfile=None, mask=None):

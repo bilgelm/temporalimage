@@ -139,6 +139,19 @@ class TestTemporalImageFake4D(unittest.TestCase):
         self.assertEqual(secondImg.get_startTime(), splitTime)
         self.assertEqual(secondImg.get_endTime(), self.timg.get_endTime())
 
+    def test_splitTime_midframe(self):
+        '''
+        Use a split time that is mid-frame
+        '''
+        splitTime = self.timg.get_frameStart()[1:2].mean()
+        (firstImg, secondImg) = self.timg.splitTime(splitTime)
+        self.assertEqual(firstImg.shape[3], 1)
+        self.assertEqual(firstImg.get_startTime(), self.timg.get_startTime())
+        self.assertEqual(firstImg.get_endTime(), splitTime)
+        self.assertEqual(secondImg.shape[3], self.timg.shape[3]-1)
+        self.assertEqual(secondImg.get_startTime(), splitTime)
+        self.assertEqual(secondImg.get_endTime(), self.timg.get_endTime())
+
     def test_dynamic_mean_firstFrame(self):
         '''
         Silly test where we call dynamic mean on the first time frame and

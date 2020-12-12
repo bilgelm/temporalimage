@@ -13,3 +13,6 @@ Clone this repository to your machine, then type in terminal:
 If you'd like to have wrappers for integration with `nipype`, use the `nipype`
 extra:
 `pip install -e PATH_TO/temporalimage[nipype]`
+
+## Running tests
+`python -m unittest tests.test_fake4D`
