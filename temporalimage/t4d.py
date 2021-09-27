@@ -411,42 +411,82 @@ def _jsonread_frameTiming(jsonfilename):
     with open(jsonfilename, 'r') as f:
         json_dict = json_load(f)
 
-    try:
-        # accommodate the older format
-        frameVals = np.array(json_dict['Time']['FrameTimes']['Values'])
+    if 'Time' in json_dict:
+         try:
+             # accommodate the older format
+             #
+             # Time
+             # |__FrameTimes
+             # |  |__Values
+             # |  |__Labels: frameStart, frameEnd, frameDuration
+             # |  |__Units
+             # 
 
-        col_frameStart = json_dict['Time']['FrameTimes']['Labels'].index('frameStart')
-        time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameStart]
-        frameStart = Quantity(frameVals[:,col_frameStart], time_unit)
+             frameVals = np.array(json_dict['Time']['FrameTimes']['Values'])
 
-        try:
-            col_frameEnd = json_dict['Time']['FrameTimes']['Labels'].index('frameEnd')
-            time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameEnd]
-            frameEnd = Quantity(frameVals[:,col_frameEnd], time_unit)
-        except:
-            col_frameDuration = json_dict['Time']['FrameTimes']['Labels'].index('frameDuration')
-            time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameDuration]
-            frameDuration = Quantity(frameVals[:,col_frameDuration], time_unit)
-            frameEnd = frameStart + frameDuration
-    except:
-        try:
-            # accommodate the intermediate PET BIDS version that allowed for
-            # different units
-            time_unit = json_dict['Time']['FrameTimesStartUnits']
-        except:
-            time_unit = 's'
-        frameStart = Quantity(np.array(json_dict['Time']['FrameTimesStart']),
-                              time_unit)
-        try:
-            time_unit = json_dict['Time']['FrameDurationUnits']
-        except:
-            time_unit = 's'
-        frameDuration = Quantity(np.array(json_dict['Time']['FrameDuration']),
+             col_frameStart = json_dict['Time']['FrameTimes']['Labels'].index('frameStart')
+             time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameStart]
+             frameStart = Quantity(frameVals[:,col_frameStart], time_unit)
+
+
+             try:
+                 col_frameEnd = json_dict['Time']['FrameTimes']['Labels'].index('frameEnd')
+                 time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameEnd]
+                 frameEnd = Quantity(frameVals[:,col_frameEnd], time_unit)
+             except:
+                 col_frameDuration = json_dict['Time']['FrameTimes']['Labels'].index('frameDuration')
+                 time_unit = json_dict['Time']['FrameTimes']['Units'][col_frameDuration]
+                 frameDuration = Quantity(frameVals[:,col_frameDuration], time_unit)
+                 frameEnd = frameStart + frameDuration
+         except:
+             # Time
+             # |__FrameTimesStartUnits
+             # |__FrameTimesStart
+             # |__FrameDurationUnits
+             # |__FrameDuration
+             try:
+                 # accommodate the intermediate PET BIDS version that allowed for
+                 # different units
+                 time_unit = json_dict['Time']['FrameTimesStartUnits']
+             except:
+                 time_unit = 's'
+                 frameStart = Quantity(np.array(json_dict['Time']['FrameTimesStart']),
+                               time_unit)
+             try:
+                 time_unit = json_dict['Time']['FrameDurationUnits']
+             except:
+                 time_unit = 's'
+                 frameDuration = Quantity(np.array(json_dict['Time']['FrameDuration']),
+                                  time_unit)
+
+                 frameEnd = frameStart + frameDuration
+    else:
+
+
+        # we are working with the 2020 PET-BIDS format
+        # Tags:
+        # FrameDuration: Time duration of each frame in default unit seconds.
+        # FrameTimesStart: Start times for all frames relative to TimeZero in default unit seconds.
+        # ScanStart: in the default unit seconds.
+        # InjectionStart: in the default unit seconds.
+        time_unit = 's'
+        frameStart = Quantity(np.array(json_dict['FrameTimesStart']),
+                               time_unit)
+        frameDuration = Quantity(np.array(json_dict['FrameDuration']),
                                  time_unit)
-
         frameEnd = frameStart + frameDuration
 
-    return frameStart, frameEnd, json_dict
+        # ScanStart: Time of start of scan with respect to TimeZero in the default unit seconds.
+        # InjectionStart: Time of start of injection with respect to TimeZero in the default unit seconds. 
+        # This corresponds to DICOM Tag (0018,1042) converted to seconds relative to TimeZero.
+
+        # In the current PET-BIDS format: TimeZero comes with the unit "hh:mm:ss" and should be equal to InjectionStart or ScanStart.
+        # Units in our format: "ScanStartUnits": "hh:mm:ss"; "InjectionStartUnits": "hh:mm:ss".
+        # TimeZero: Time zero to which all scan and/or blood measurements have been adjusted to.
+        # InjectionStart = json_dict['TimeZero']
+        # ScanStart = json_dict['TimeZero']
+
+        return frameStart, frameEnd, json_dict
 
 def _jsonwrite_frameTiming(frameStart, frameEnd,
                            jsonfilename, json_dict={}, time_unit='sec'):
