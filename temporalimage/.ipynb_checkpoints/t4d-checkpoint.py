@@ -1,7 +1,6 @@
 from nibabel.analyze import SpatialImage
 import numpy as np
 from . import unitreg, Quantity # via pint
-import json
 
 class TemporalImage(SpatialImage):
     '''
@@ -488,16 +487,6 @@ def _jsonread_frameTiming(jsonfilename):
         # ScanStart = json_dict['TimeZero']
     return frameStart, frameEnd, json_dict
 
-####################Fix Serialization using JSONEncoder#########################################
-
-from json import JSONEncoder
-
-class NumpyArrayEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return JSONEncoder.default(self, obj)
-
 def _jsonwrite_frameTiming(frameStart, frameEnd,
                            jsonfilename, json_dict={}, time_unit='sec'):
     '''
@@ -526,17 +515,9 @@ def _jsonwrite_frameTiming(frameStart, frameEnd,
         'FrameDuration': (frameEnd - frameStart).to(time_unit).magnitude,
         'FrameDurationUnits': time_unit
     }
-    #   with open(jsonfilename, 'w') as f:
-    #       json.dump(json_dict, f)
-    # We got an error here with the original code: TypeError: Object of type ndarray is not JSON serializable
-    # Need to convert Numpy arrays into JSON and write it into JSON file
 
-    #Fix Serialization
     with open(jsonfilename, 'w') as f:
-        json.dump(json_dict, f, cls=NumpyArrayEncoder)
-        #print("Done writing serialized NumPy array into file")
-
-####################################################################################################
+        json.dump(json_dict, f)
 
 def load(filename, timingfilename, **kwargs):
     '''

@@ -26,7 +26,7 @@ class TestTemporalImageFake4D(unittest.TestCase):
 
     def test_get_frameDuration(self):
         self.assertTrue(np.allclose(np.array([5,5] + [10]*5),
-                                self.timg.get_frameDuration().to('min').magnitude))
+                                    self.timg.get_frameDuration().to('min').magnitude))
 
     def test_get_frameStart(self):
         self.assertTrue(np.allclose(np.array([0, 5, 10, 20, 30, 40, 50]),
