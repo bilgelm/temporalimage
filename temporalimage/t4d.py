@@ -486,7 +486,7 @@ def _jsonread_frameTiming(jsonfilename):
         # InjectionStart = json_dict['TimeZero']
         # ScanStart = json_dict['TimeZero']
 
-        return frameStart, frameEnd, json_dict
+    return frameStart, frameEnd, json_dict
 
 def _jsonwrite_frameTiming(frameStart, frameEnd,
                            jsonfilename, json_dict={}, time_unit='sec'):
