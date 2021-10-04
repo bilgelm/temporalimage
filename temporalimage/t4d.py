@@ -421,7 +421,7 @@ def _jsonread_frameTiming(jsonfilename):
              # |  |__Values
              # |  |__Labels: frameStart, frameEnd, frameDuration
              # |  |__Units
-             # 
+             #
 
              frameVals = np.array(json_dict['Time']['FrameTimes']['Values'])
 
@@ -478,7 +478,7 @@ def _jsonread_frameTiming(jsonfilename):
         frameEnd = frameStart + frameDuration
 
         # ScanStart: Time of start of scan with respect to TimeZero in the default unit seconds.
-        # InjectionStart: Time of start of injection with respect to TimeZero in the default unit seconds. 
+        # InjectionStart: Time of start of injection with respect to TimeZero in the default unit seconds.
         # This corresponds to DICOM Tag (0018,1042) converted to seconds relative to TimeZero.
 
         # In the current PET-BIDS format: TimeZero comes with the unit "hh:mm:ss" and should be equal to InjectionStart or ScanStart.

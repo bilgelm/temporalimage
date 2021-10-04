@@ -14,6 +14,7 @@ setup(name='temporalimage',
           'scipy',
           'numpy',
           'pint',
+          'jsonschema'
       ],
       zip_safe=False,
       test_suite='nose.collector',
