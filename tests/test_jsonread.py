@@ -13,10 +13,9 @@ frameEnd_arr = frameStart_arr + frameDuration_arr
 class TestJsonFormat(unittest.TestCase):
 	def setUp(self):
 		#jsonTestFile = "/opt/anaconda3/envs/toydataset/pet-analysis/tests/test_data/ds001420/sub-01/ses-baseline/pet/sub-01_ses-baseline_pet.json"
-		jsonTestFile = "/temporalimage/tests/test_data/"
-		jsonp = os.path.dirname(jsonTestFile)
-		self.test_data_dir = os.path.join(jsonp, "sub-01_ses-baseline_pet.json")
-		#self.output_dir = os.path.join(jsonp, "corrected_sub-01_ses-baseline_pet.json")
+		jsonp = os.path.dirname(os.path.abspath(__file__))
+		self.test_data_dir = os.path.join(jsonp, "test_data", "sub-01_ses-baseline_pet.json")
+
 		frameStart, frameEnd, jsonDict = _jsonread_frameTiming(self.test_data_dir)
 		self.frame_Start = frameStart
 		self.frame_End = frameEnd
