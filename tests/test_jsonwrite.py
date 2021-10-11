@@ -6,7 +6,7 @@ import numpy as np
 from temporalimage import Quantity
 from temporalimage.t4d import _jsonread_frameTiming
 from temporalimage.t4d import _jsonwrite_frameTiming
-from .generate_test_json import generate_fake_json
+from tests.generate_test_json import generate_fake_json
 import os
 import simplejson as json
 from json import load as json_load

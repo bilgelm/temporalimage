@@ -5,7 +5,7 @@ import numpy as np
 from temporalimage import Quantity
 from temporalimage.t4d import _jsonread_frameTiming
 import os
-from .generate_test_json import generate_fake_json
+from tests.generate_test_json import generate_fake_json
 
 frameStart_arr = np.array([0, 10, 20, 30, 40, 50, 60, 80, 100, 120, 140, 160, 180, 200, 240, 280, 320, 360, 400, 580, 640, 720, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 2000, 2500])
 frameDuration_arr = np.array([10, 10, 10, 10, 10, 20, 20, 20, 20, 20, 30, 30, 30, 30, 30, 60, 60, 60, 60, 60, 120, 120, 120, 120, 120, 240, 240, 240, 240, 300, 300, 300])
