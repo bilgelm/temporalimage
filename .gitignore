@@ -11,3 +11,6 @@
 # rendered doc files
 /docs/build/
 /docs/source/_static/
+
+# JupyterLab files
+*.ipynb

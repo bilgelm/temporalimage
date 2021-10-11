@@ -6,6 +6,7 @@ import numpy as np
 from temporalimage import Quantity
 from temporalimage.t4d import _jsonread_frameTiming
 from temporalimage.t4d import _jsonwrite_frameTiming
+from .generate_test_json import generate_fake_json
 import os
 import simplejson as json
 from json import load as json_load
@@ -26,8 +27,9 @@ from json import load as json_load
 #FrameTimesStart, FrameTimesStartUnits, FrameDuration and FrameDurationUnits must be present in json data.
 class TestJsonFormat(unittest.TestCase):
 
-    Filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_data", "sub-01_ses-baseline_pet.json")
-    File_output = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_data", "corrected_sub-01_ses-baseline_pet.json")
+    fake_jsonfile = generate_fake_json()
+    Filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_data", "fake_data.json")
+    File_output = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_data", "corrected_fake_data.json")
 
     frameStart, frameEnd, jsonDict = _jsonread_frameTiming(Filepath)
     _jsonwrite_frameTiming(frameStart, frameEnd, File_output)
