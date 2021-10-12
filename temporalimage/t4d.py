@@ -504,7 +504,6 @@ def _jsonwrite_frameTiming(frameStart, frameEnd, jsonfilename, json_dict={}, tim
 
     with open(jsonfilename, 'w') as f:
         json.dump(json_dict, f)
-        print(json_dict)
 
     #   with open(jsonfilename, 'w') as f:
     #       json.dump(json_dict, f)
