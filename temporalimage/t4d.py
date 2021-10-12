@@ -488,56 +488,49 @@ def _jsonread_frameTiming(jsonfilename):
         # ScanStart = json_dict['TimeZero']
     return frameStart, frameEnd, json_dict
 
-####################Fix Serialization using JSONEncoder#########################################
 
-from json import JSONEncoder
+def _jsonwrite_frameTiming(frameStart, frameEnd, jsonfilename, json_dict={}, time_unit='sec'):
 
-class NumpyArrayEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return JSONEncoder.default(self, obj)
-
-def _jsonwrite_frameTiming(frameStart, frameEnd,
-                           jsonfilename, json_dict={}, time_unit='sec'):
-    '''
-    Write PET-BIDS style json sidecar
-
-    Args:
-        frameStart (temporalimage.Quantity):
-            vector containing the start times of each frame
-        frameEnd (temporalimage.Quantity):
-            vector containing the end times of each frame
-        jsonfilename (str): output path
-        json_dict (dict): json dictionary
-        time_unit (str): units of time to be used in the output json
-    '''
-    #json_dict['Time'] = { 'FrameTimes': {
-    #                        'Labels': ['frameStart', 'frameEnd'],
-    #                        'Units': [time_unit, time_unit],
-    #                        'Values': np.vstack((
-    #                                  frameStart.to(time_unit).magnitude,
-    #                                  frameEnd.to(time_unit).magnitude)).T.tolist()
-    #                       } }
+    #Here we convert the numpy array to list
+    framestart_to_list = (frameStart.to(time_unit).magnitude).tolist()
+    frameduration_to_list = ((frameEnd - frameStart).to(time_unit).magnitude).tolist()
 
     json_dict['Time'] = {
-        'FrameTimesStart': frameStart.to(time_unit).magnitude,
-        'FrameTimesStartUnits': time_unit,
-        'FrameDuration': (frameEnd - frameStart).to(time_unit).magnitude,
-        'FrameDurationUnits': time_unit
-    }
+             'FrameTimesStart': framestart_to_list,
+             'FrameTimesStartUnits': time_unit,
+             'FrameDuration': frameduration_to_list,
+             'FrameDurationUnits': time_unit
+             }
+
+    with open(jsonfilename, 'w') as f:
+        json.dump(json_dict, f)
+        print(json_dict)
+
     #   with open(jsonfilename, 'w') as f:
     #       json.dump(json_dict, f)
     # We got an error here with the original code: TypeError: Object of type ndarray is not JSON serializable
-    # Need to convert Numpy arrays into JSON and write it into JSON file
+    # Need to convert Numpy arrays into JSON and write it into JSON file, see above for solution
 
-    #Fix Serialization
-    with open(jsonfilename, 'w') as f:
-        json.dump(json_dict, f, cls=NumpyArrayEncoder)
-        #print("Done writing serialized NumPy array into file")
 
-####################################################################################################
+'''
+json_dict output without converting numpy array to list
+{'Time': {'FrameTimesStart': array([   0,   10,   20,   30,   40,   50,   60,   80,  100,  120,  140, 160,  180,  200,  240,  280,  320,  360,  400,  580,  640,  720, 800,  900, 1000, 1100, 1200, 1300, 1400, 1500, 2000, 2500]),
+        'FrameTimesStartUnits': 'sec',
+        'FrameDuration': array([ 10,  10,  10,  10,  10,  20,  20,  20,  20,  20,  30,  30,  30, 30,  30,  60,  60,  60,  60,  60, 120, 120, 120, 120, 120, 240, 240, 240, 240, 300, 300, 300]),
+        'FrameDurationUnits': 'sec'}}
 
+json_dict output after converting numpy array to list
+{'Time': {'FrameTimesStart': [0, 10, 20, 30, 40, 50, 60, 80, 100, 120, 140, 160, 180, 200, 240, 280, 320, 360, 400, 580, 640, 720, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 2000, 2500],
+          'FrameTimesStartUnits': 'sec',
+          'FrameDuration': [10, 10, 10, 10, 10, 20, 20, 20, 20, 20, 30, 30, 30, 30, 30, 60, 60, 60, 60, 60, 120, 120, 120, 120, 120, 240, 240, 240, 240, 300, 300, 300],
+          'FrameDurationUnits': 'sec'}}
+
+#Quantity: implements a class to describe a physical quantity:
+#the product of a numerical value and a unit of measurement.
+#Parameters:
+#value (str, pint.Quantity or any numeric type) -Value of the physical quantity to be created.
+#units (UnitsContainer, str or pint.Quantity) – Units of the physical quantity to be created.
+'''
 def load(filename, timingfilename, **kwargs):
     '''
     Load a temporal image
