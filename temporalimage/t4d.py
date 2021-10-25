@@ -490,6 +490,27 @@ def _jsonread_frameTiming(jsonfilename):
 
 
 def _jsonwrite_frameTiming(frameStart, frameEnd, jsonfilename, json_dict={}, time_unit='sec'):
+    '''
+    Write PET-BIDS style json sidecar
+
+    Args:
+        frameStart (temporalimage.Quantity):
+            vector containing the start times of each frame
+        frameEnd (temporalimage.Quantity):
+            vector containing the end times of each frame
+        jsonfilename (str): output path
+        json_dict (dict): json dictionary
+        time_unit (str): units of time to be used in the output json
+    '''
+    #json_dict['Time'] = { 'FrameTimes': {
+    #                        'Labels': ['frameStart', 'frameEnd'],
+    #                        'Units': [time_unit, time_unit],
+    #                        'Values': np.vstack((
+    #                                  frameStart.to(time_unit).magnitude,
+    #                                  frameEnd.to(time_unit).magnitude)).T.tolist()
+    #                       } }
+
+
 
     #Here we convert the numpy array to list
     framestart_to_list = (frameStart.to(time_unit).magnitude).tolist()
